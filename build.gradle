@@ -58,10 +58,14 @@ repositories {
 }
 
 dependencies {
-    String forgeVersion = java.util.Optional.ofNullable(System.getenv("CI_FORGE") ?: getProperty("forge.version"))
+    String versionArg = System.getenv("CI_FORGE") ?: getProperty("forge.version")
+    String forgeVersion = java.util.Optional.ofNullable(versionArg)
             .filter(Predicate.isEqual("default").negate())
-            .filter(Predicate.isEqual("latest").negate())
-            .orElseGet({ getLatestForge(null) })
+            .filter { s -> !s.contains("latest") }
+            .orElseGet({
+                String key = versionArg == null || !versionArg.contains("latest") ? null : versionArg
+                getLatestForge(key)
+            })
     String forgeArtifact = forgeVersion.startsWith("net.minecraftforge:forge:") ? forgeVersion : "net.minecraftforge:forge:$forgeVersion"
 
     minecraft(forgeArtifact)
