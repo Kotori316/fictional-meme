@@ -25,7 +25,7 @@ sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = co
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
-    mappings channel: 'snapshot', version: '20201028-1.16.3'
+    mappings channel: getProperty("mapping.channel"), version: getProperty("mapping.version")
     runs {
         data {
             workingDirectory project.file('run')
@@ -64,7 +64,7 @@ dependencies {
             .filter { s -> !s.contains("latest") }
             .orElseGet({
                 String key = versionArg == null || !versionArg.contains("latest") ? null : versionArg
-                getLatestForge(key)
+                getLatestForge(key, getForgeVersionList())
             })
     String forgeArtifact = forgeVersion.startsWith("net.minecraftforge:forge:") ? forgeVersion : "net.minecraftforge:forge:$forgeVersion"
 
@@ -87,25 +87,32 @@ dependencies {
     }
 }
 
-static String getLatestForge(String key) {
+static JsonObject getForgeVersionList() {
     def target = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/promotions_slim.json"
-    URL apiUrl = new URL(target)
-    InputStream inputStream = apiUrl.openStream()
-    Gson gson = new Gson()
-    JsonObject allList = gson.fromJson(new InputStreamReader(inputStream), JsonObject.class).getAsJsonObject("promos")
-    if (key == null) {
-        Pattern pattern = Pattern.compile("(1\\.(\\d+)(|\\.(\\d+)))-latest")
-        return allList.keySet().stream().map { s -> pattern.matcher(s) }
+    def apiUrl = new URL(target)
+    def inputStream = apiUrl.openStream()
+    def gson = new Gson()
+    return gson.fromJson(new InputStreamReader(inputStream), JsonObject.class).getAsJsonObject("promos")
+}
+
+static String getLatestForge(String key, JsonObject allList) {
+    if (key == null || !allList.has(key)) {
+        if (key != null) System.out.println("Key $key was not found." as String)
+        Pattern pattern = Pattern.compile("(1\\.(\\d+)(?:|\\.(\\d+)))-(?:latest|recommended)")
+        final int versionPos = 1
+        final int majorPos = 2
+        final int minorPos = 3
+        return allList.entrySet().stream().map { e -> pattern.matcher(e.getKey()) }
                 .filter { m -> m.matches() }
                 .map { m ->
-                    int major = Integer.parseInt(m.group(2))
-                    int minor = m.group(4) == null || m.group(4).isEmpty() ? 0 : Integer.parseInt(m.group(4))
+                    int major = Integer.parseInt(m.group(majorPos))
+                    int minor = m.group(minorPos) == null || m.group(minorPos).isEmpty() ? 0 : Integer.parseInt(m.group(minorPos))
                     return new AbstractMap.SimpleImmutableEntry<Integer, Matcher>(major * 100 + minor, m)
                 }
-                .sorted(Map.Entry.comparingByKey().reversed() as Comparator<? super AbstractMap.SimpleImmutableEntry<Integer, Matcher>>)
+                .sorted(Map.Entry.<Integer, Matcher> comparingByKey().reversed())
                 .map { e -> e.getValue() }
                 .findFirst()
-                .map { k -> k.group(1) + "-" + allList.get(k.group()).getAsString() }
+                .map { k -> k.group(versionPos) + "-" + allList.get(k.group()).getAsString() }
                 .orElse(null)
     } else {
         String prefix = key.split("-")[0]
@@ -118,16 +125,20 @@ task printForgeVersions() {
         def versions = [
                 "1.15.1-latest",
                 "1.16.4-latest",
+                "1.16.4-recommended",
                 "1.16.5-latest",
                 "1.12.2-latest",
+                "1.12.2-recommended",
                 "1.12-latest",
                 "1.8-latest",
                 "1.7.2-latest",
                 "1.7.10-latest",
                 null
         ]
+        def versionMap = getForgeVersionList()
+        // println(versionMap.entrySet())
         for (String s : versions) {
-            println("$s: ${getLatestForge(s)}")
+            System.out.println("$s: ${getLatestForge(s, versionMap)}" as String)
         }
     }
 }
