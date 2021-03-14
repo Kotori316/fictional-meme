@@ -97,12 +97,14 @@ static JsonObject getForgeVersionList() {
 
 static String getLatestForge(String key, JsonObject allList) {
     if (key == null || !allList.has(key)) {
-        if (key != null) System.out.println("Key $key was not found." as String)
-        Pattern pattern = Pattern.compile("(1\\.(\\d+)(?:|\\.(\\d+)))-(?:latest|recommended)")
+        Pattern pattern = Pattern.compile("(1\\.(\\d+)(?:|\\.(\\d+)))-latest")
         final int versionPos = 1
         final int majorPos = 2
         final int minorPos = 3
-        return allList.entrySet().stream().map { e -> pattern.matcher(e.getKey()) }
+        return allList.entrySet().stream()
+                .map { e -> e.getKey() }
+                .filter { s -> key == null || s.contains(key) }
+                .map { s -> pattern.matcher(s) }
                 .filter { m -> m.matches() }
                 .map { m ->
                     int major = Integer.parseInt(m.group(majorPos))
@@ -133,8 +135,13 @@ task printForgeVersions() {
                 "1.8-latest",
                 "1.7.2-latest",
                 "1.7.10-latest",
-                null
+                null,
+                "1.7.10",
+                "1.12.2",
+                "1.16.2",
+                "1.16.5",
         ]
+        versions.sort(Comparator.nullsFirst(Comparator.naturalOrder()))
         def versionMap = getForgeVersionList()
         // println(versionMap.entrySet())
         for (String s : versions) {
