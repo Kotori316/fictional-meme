@@ -7,7 +7,7 @@ import java.util.regex.Pattern
 
 buildscript {
     repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://maven.minecraftforge.net/' }
         jcenter()
         mavenCentral()
     }
@@ -73,9 +73,9 @@ dependencies {
     def scala_version = "2.13.5"
     implementation "org.scala-lang:scala-library:${scala_version}"
     // A library of functional programing in Scala
-    implementation group: 'org.typelevel', name: "cats-core_" + scala_version.substring(0, scala_version.lastIndexOf(".")), version: '2.4.2'
+    implementation group: 'org.typelevel', name: "cats-core_" + scala_version.substring(0, scala_version.lastIndexOf(".")), version: '2.6.0'
 
-    implementation(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.5-build-1', classifier: 'dev')
+    implementation(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.5-build-2', classifier: 'dev')
 
     String JUPITER_VERSION = System.getenv("JUPITER_VERSION") ?: '5.7.0'
     runtimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUPITER_VERSION)
@@ -88,7 +88,7 @@ dependencies {
 }
 
 static JsonObject getForgeVersionList() {
-    def target = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/promotions_slim.json"
+    def target = "https://maven.minecraftforge.net//net/minecraftforge/forge/promotions_slim.json"
     def apiUrl = new URL(target)
     def inputStream = apiUrl.openStream()
     def gson = new Gson()
