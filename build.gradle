@@ -88,7 +88,7 @@ dependencies {
 }
 
 static JsonObject getForgeVersionList() {
-    def target = "https://maven.minecraftforge.net//net/minecraftforge/forge/promotions_slim.json"
+    def target = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/promotions_slim.json"
     def apiUrl = new URL(target)
     def inputStream = apiUrl.openStream()
     def gson = new Gson()
