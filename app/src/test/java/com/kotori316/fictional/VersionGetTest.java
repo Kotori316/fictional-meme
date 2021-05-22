@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.util.AbstractMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.google.gson.Gson;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -113,7 +115,19 @@ class VersionGetTest {
     void notExistLatest() {
         assertAll(
             () -> assertEquals("1.7.10-10.13.4.1614", vg.getLatest("1.7.5-latest")),
-            () -> assertEquals("1.16.5-36.1.23", vg.getLatest("1.16-latest"))
+            () -> assertEquals("1.16.5-36.1.23", vg.getLatest("1.16-latest")),
+            () -> assertEquals("1.17-37.0.0", vg.getLatest("1.18"))
         );
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "1.7.10-10.13.4.1600",
+        "1.16.4-35.1.36",
+        "1.17.0-37.1.0"
+    })
+    void checkKey(String key) {
+        var function = App.getVersion(vg);
+        assertEquals(key, function.apply(key));
     }
 }
