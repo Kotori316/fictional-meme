@@ -1,0 +1,48 @@
+name: Build
+on:
+  push:
+    paths:
+      - "app/**"
+      - ".github/workflows/build.yml"
+      - "Dockerfile"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+      - name: Check Java Toolchain and Dependencies
+        run: ./gradlew javaToolchains --warning-mode all && ./gradlew dependencies
+      - name: Test
+        run: ./gradlew test
+      - name: Upload failed test report
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          path: build/reports/tests/*
+
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # Must be lowered in script. like ${IMAGE_NAME,,}
+      IMAGE_NAME: docker.pkg.github.com/${{ github.repository }}/fictional-meme
+      # I'm using the same name to avoid changes of other workflows.
+      TAG_NAME: latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Docker image
+        run: |
+          docker build -t ${IMAGE_NAME,,}:${TAG_NAME,,} .
+          docker run --rm ${IMAGE_NAME,,}:${TAG_NAME,,} java --version
+      - name: Push Image
+        run: |
+          echo "${GITHUB_TOKEN}" | docker login docker.pkg.github.com -u kotori316 --password-stdin
+          docker push ${IMAGE_NAME,,}:${TAG_NAME,,}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
