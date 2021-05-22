@@ -1,0 +1,72 @@
+buildscript {
+    repositories {
+        maven { url = 'https://maven.minecraftforge.net/' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+    }
+}
+apply plugin: 'net.minecraftforge.gradle'
+version = '1.0'
+group = 'com.kotori316' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = 'modid'
+
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+
+println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
+minecraft {
+    mappings channel: getProperty("mapping.channel"), version: getProperty("mapping.version")
+    runs {
+        data {
+            workingDirectory project.file('run')
+            forceExit false
+            property 'forge.logging.markers', 'REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+            property 'mixin.env.disableRefMap', 'true'
+            property "mixin.debug.export", "true"
+
+            String mods = System.getenv("CI_MODS") ?: getProperty("ci.mods") ?: ""
+            args '--mod', mods, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+        }
+    }
+}
+
+repositories {
+    maven {
+        name = "Azure-Kotori316"
+        url = uri("https://pkgs.dev.azure.com/Kotori316/minecraft/_packaging/mods/maven/v1")
+        content {
+            includeModule("com.kotori316", "ScalableCatsForce".toLowerCase())
+            includeModule("com.kotori316", "ModJar")
+        }
+    }
+    repositories.stream().filter { it instanceof MavenArtifactRepository }.forEach { repo ->
+        repo.content {
+            excludeVersionByRegex(".*", ".*", ".*_mapped_snapshot_.*")
+        }
+    }
+}
+
+dependencies {
+    String forgeVersion = System.getenv("CI_FORGE") ?: getProperty("forge.version")
+    String forgeArtifact = forgeVersion.startsWith("net.minecraftforge:forge:") ? forgeVersion : "net.minecraftforge:forge:$forgeVersion"
+
+    minecraft(forgeArtifact)
+
+    def scala_version = "2.13.5"
+    implementation "org.scala-lang:scala-library:${scala_version}"
+    // A library of functional programing in Scala
+    implementation group: 'org.typelevel', name: "cats-core_" + scala_version.substring(0, scala_version.lastIndexOf(".")), version: '2.6.0'
+
+    implementation(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.5-build-2', classifier: 'dev')
+
+    String JUPITER_VERSION = System.getenv("JUPITER_VERSION") ?: '5.7.0'
+    runtimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUPITER_VERSION)
+    runtimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: JUPITER_VERSION)
+    runtimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: JUPITER_VERSION)
+    runtimeOnly(group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.7.0')
+    runtimeOnly(group: "com.kotori316", name: "ModJar", version: "2.0.1") {
+        transitive(false)
+    }
+}

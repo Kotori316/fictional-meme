@@ -12,6 +12,9 @@ RUN git clone --depth 1 https://github.com/Kotori316/fictional-meme.git && \
     chmod +x ./gradlew && \
     ./gradlew shadowJar
 
-FROM adoptopenjdk:11-openj9
+FROM adoptopenjdk:11-hotspot
 
 COPY --from=builder /fictional-meme/app/build/libs/* /
+COPY ["run/*", "gradlew", "gradle", "/root/"]
+WORKDIR /root
+RUN mkdir gradle && mv wrapper/ gradle/
