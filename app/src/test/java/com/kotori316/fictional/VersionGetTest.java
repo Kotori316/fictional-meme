@@ -19,6 +19,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class VersionGetTest {
@@ -116,8 +117,16 @@ class VersionGetTest {
         assertAll(
             () -> assertEquals("1.7.10-10.13.4.1614", vg.getLatest("1.7.5-latest")),
             () -> assertEquals("1.16.5-36.1.23", vg.getLatest("1.16-latest")),
-            () -> assertEquals("1.17-37.0.0", vg.getLatest("1.18"))
+            () -> assertEquals("1.17-37.0.0", vg.getLatest("1.18")),
+            () -> assertEquals("1.17-37.0.0", vg.getLatest("2.0"))
         );
+    }
+
+    @ParameterizedTest
+    @MethodSource({"getPresentKey", "getLatest"})
+    void notFound(String input) {
+        var vg = new VersionGet(new JsonObject());
+        assertThrows(IllegalArgumentException.class, () -> vg.getLatest(input));
     }
 
     @ParameterizedTest

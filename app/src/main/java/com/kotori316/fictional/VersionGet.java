@@ -58,13 +58,14 @@ public class VersionGet {
                 .filter(e -> e.getKey().group.equals("latest"))
                 .map(e -> Map.entry(e.getKey().versionString, e.getValue()))
                 .collect(Collectors.toUnmodifiableList());
-            var latest = allLatest.stream()
+            var sameMajors = allLatest.stream()
                 .filter(e -> e.getKey().equalsMajor(vKey.versionString))
                 .collect(Collectors.toUnmodifiableList());
-            return latest.stream().filter(e -> e.getKey().equals(vKey.versionString)).findFirst()
-                .or(() -> latest.stream().max(Map.Entry.comparingByKey(VersionString.COMPARATOR)))
+            return sameMajors.stream().filter(e -> e.getKey().equals(vKey.versionString)).findFirst()
+                .or(() -> sameMajors.stream().max(Map.Entry.comparingByKey(VersionString.COMPARATOR)))
                 .or(() -> allLatest.stream().max(Map.Entry.comparingByKey(VersionString.COMPARATOR)))
-                .map(e -> e.getKey().toString() + "-" + e.getValue()).orElse(null);
+                .map(e -> e.getKey().toString() + "-" + e.getValue())
+                .orElseThrow(() -> new IllegalArgumentException("No compatible version found for " + vKey));
         } else {
             var version = this.versionMap.get(vKey);
             return vKey.versionString.toString() + "-" + version;

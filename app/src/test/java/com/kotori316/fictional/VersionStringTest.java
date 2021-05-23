@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class VersionStringTest {
@@ -57,6 +58,12 @@ class VersionStringTest {
         );
         var vs = new VersionString(input);
         assertEquals("1.5.2_pre", vs.toString());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"bad", "1", "1L.2.52", "1.2L.1", "1,2,3", "1.3."})
+    void badInput(String input) {
+        assertThrows(IllegalArgumentException.class, () -> new VersionString(input));
     }
 
     @Test
