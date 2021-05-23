@@ -15,6 +15,5 @@ RUN git clone --depth 1 https://github.com/Kotori316/fictional-meme.git && \
 FROM adoptopenjdk:11-hotspot
 
 COPY --from=builder /fictional-meme/app/build/libs/* /
-COPY ["run/*", "gradlew", "gradle", "/root/"]
-WORKDIR /root
-RUN mkdir gradle && mv wrapper/ gradle/
+COPY ["run/*", "gradlew", "gradle", "/work/"]
+RUN mkdir /work/gradle && mv /work/wrapper/ /work/gradle/
