@@ -1,7 +1,7 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
-    id "com.github.johnrengelman.shadow" version "5.2.0"
+    id "com.github.johnrengelman.shadow" version "7.0.0"
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(11)
@@ -9,6 +9,8 @@ repositories {
     mavenCentral()
 }
 
+group =  'com.kotori316'
+archivesBaseName = "fictional-meme"
 version = "2.0"
 
 dependencies {
@@ -18,7 +20,7 @@ dependencies {
     testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: JUPITER_VERSION)
 
     // Use JUnit Jupiter Engine for testing.
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    testRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine')
 
     // This dependency is used by the application.
     // implementation(group: 'com.google.guava', name: 'guava', version: '30.1.1-jre')
@@ -29,7 +31,6 @@ application {
     // Define the main class for the application.
     String mainName = "com.kotori316.fictional.App"
     mainClass.set(mainName)
-    setMainClassName(mainName)
 }
 
 tasks.named('test') {
