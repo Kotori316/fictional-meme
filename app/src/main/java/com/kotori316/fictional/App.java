@@ -1,34 +1,45 @@
 package com.kotori316.fictional;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class App {
     public static void main(String[] args) {
-        var vg = new VersionGet();
         List<String> results;
         if (args.length == 0) {
+            var vg = new VersionGet();
             results = List.of(vg.getLatest(null));
         } else {
-            results = Arrays.stream(args).map(getVersion(vg)).collect(Collectors.toList());
+            results = getVersions(args);
         }
         for (String s : results) {
             System.out.println(s);
         }
     }
 
-    static Function<String, String> getVersion(VersionGet vg) {
-        return key -> {
-            var split = key.split("-", 2);
-            if (split.length == 2) {
-                var maybeVersion = split[1].split("\\.");
-                if (maybeVersion.length > 2) {
-                    return key;
-                }
+    static List<String> getVersions(String[] versionStrings) {
+        VersionGet vg = null;
+        List<String> list = new ArrayList<>();
+        for (String s : versionStrings) {
+            String ver;
+            if (shouldSearch(s)) {
+                if (vg == null)
+                    vg = new VersionGet();
+                ver = vg.getLatest(s);
+            } else {
+                ver = s;
             }
-            return vg.getLatest(key);
-        };
+            list.add(ver);
+        }
+        return list;
+    }
+
+    static boolean shouldSearch(String key) {
+        var split = key.split("-", 2);
+        if (split.length == 2) {
+            var maybeVersion = split[1].split("\\.");
+            return maybeVersion.length <= 2;
+        }
+        return true;
     }
 }
