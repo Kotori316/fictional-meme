@@ -2,6 +2,7 @@ plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
     id "com.github.johnrengelman.shadow" version "7.0.0"
+    id "org.beryx.jlink" version "2.24.0"
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(11)
@@ -9,7 +10,7 @@ repositories {
     mavenCentral()
 }
 
-group =  'com.kotori316'
+group = 'com.kotori316'
 archivesBaseName = "fictional-meme"
 version = "2.0"
 
@@ -31,6 +32,14 @@ application {
     // Define the main class for the application.
     String mainName = "com.kotori316.fictional.App"
     mainClass.set(mainName)
+    mainModule.set("fictional.meme")
+}
+
+jlink {
+    addOptions('--compress', '2', '--no-header-files', '--no-man-pages')
+    launcher {
+        it.name = "fictional-meme"
+    }
 }
 
 tasks.named('test') {
