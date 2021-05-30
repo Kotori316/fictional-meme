@@ -50,9 +50,9 @@ jobs:
           tags: ${{ env.IMAGE_NAME }}:${{ env.TAG }}
       - name: Check java version
         run: |
-          docker run --rm ${IMAGE_NAME}:${TAG_NAME} java --version
+          docker run --rm ${IMAGE_NAME}:${TAG} java --version
           echo "::group::Module List"
-          docker run --rm ${IMAGE_NAME}:${TAG_NAME} java --list-modules
+          docker run --rm ${IMAGE_NAME}:${TAG} java --list-modules
           echo "::endgroup::"
       - name: Push
         uses: docker/build-push-action@v2
