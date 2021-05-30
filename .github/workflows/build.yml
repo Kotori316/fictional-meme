@@ -18,7 +18,10 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
       - name: Check Java Toolchain and Dependencies
-        run: ./gradlew javaToolchains --warning-mode all && ./gradlew dependencies
+        run: |
+        ./gradlew javaToolchains --warning-mode all
+        ./gradlew dependencies
+        ./gradlew :app:dependencies
       - name: Test
         run: ./gradlew test
       - name: Upload failed test report
@@ -48,15 +51,13 @@ jobs:
         with:
           context: .
           tags: ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          outputs: type=image
       - name: Check java version
         run: |
+          docker images
           docker run --rm ${IMAGE_NAME}:${TAG} java --version
           echo "::group::Module List"
           docker run --rm ${IMAGE_NAME}:${TAG} java --list-modules
           echo "::endgroup::"
       - name: Push
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+        run: docker push ${IMAGE_NAME}:${TAG}
