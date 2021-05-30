@@ -29,20 +29,34 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    env:
-      # Must be lowered in script. like ${IMAGE_NAME,,}
-      IMAGE_NAME: docker.pkg.github.com/${{ github.repository }}/fictional-meme
-      # I'm using the same name to avoid changes of other workflows.
-      TAG_NAME: latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build Docker image
+      - uses: docker/setup-buildx-action@v1
+      - uses: docker/login-action@v1
+        with:
+          registory: docker.pkg.github.com
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get image name
         run: |
-          docker build -t ${IMAGE_NAME,,}:${TAG_NAME,,} .
-          docker run --rm ${IMAGE_NAME,,}:${TAG_NAME,,} java --version
-      - name: Push Image
+          i=docker.pkg.github.com/${{ github.repository }}/fictional-meme
+          echo "IMAGE_NAME=${i,,}" >> $GITHUB_ENV
+          t=latest
+          echo "TAG=${t,,}" >> $GITHUB_ENV
+      - name: Build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          tags: ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+      - name: Check java version
         run: |
-          echo "${GITHUB_TOKEN}" | docker login docker.pkg.github.com -u kotori316 --password-stdin
-          docker push ${IMAGE_NAME,,}:${TAG_NAME,,}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          docker run --rm ${IMAGE_NAME}:${TAG_NAME} java --version
+          echo "::group::Module List"
+          docker run --rm ${IMAGE_NAME}:${TAG_NAME} java --list-modules
+          echo "::endgroup::"
+      - name: Push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ${{ env.IMAGE_NAME }}:${{ env.TAG }}
