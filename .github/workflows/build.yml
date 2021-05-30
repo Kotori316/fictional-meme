@@ -19,9 +19,9 @@ jobs:
         run: chmod +x ./gradlew
       - name: Check Java Toolchain and Dependencies
         run: |
-        ./gradlew javaToolchains --warning-mode all
-        ./gradlew dependencies
-        ./gradlew :app:dependencies
+          ./gradlew javaToolchains --warning-mode all
+          ./gradlew dependencies
+          ./gradlew :app:dependencies
       - name: Test
         run: ./gradlew test
       - name: Upload failed test report
