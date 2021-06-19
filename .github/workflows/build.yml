@@ -44,7 +44,7 @@ jobs:
         run: |
           i=docker.pkg.github.com/${{ github.repository }}/fictional-meme
           echo "IMAGE_NAME=${i,,}" >> $GITHUB_ENV
-          t=latest
+          t=1.16.5
           echo "TAG=${t,,}" >> $GITHUB_ENV
       - name: Build
         uses: docker/build-push-action@v2
@@ -63,5 +63,6 @@ jobs:
           echo "Found jar file at $jar_path"
           echo "Latest version of forge"
           docker run --rm ${IMAGE_NAME}:${TAG} java -jar $jar_path
+          docker tag ${IMAGE_NAME}:${TAG} ${IMAGE_NAME}:latest
       - name: Push
-        run: docker push ${IMAGE_NAME}:${TAG}
+        run: docker push ${IMAGE_NAME}:${TAG} && docker push ${IMAGE_NAME}:latest
