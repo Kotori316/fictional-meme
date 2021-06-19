@@ -9,5 +9,5 @@ RUN cd fictional-meme && \
 FROM adoptopenjdk:11-hotspot
 
 COPY --from=builder /fictional-meme/app/build/libs/* /
-COPY ["run/*", "gradlew", "gradle", "/work/"]
-RUN mkdir /work/gradle && mv /work/wrapper/ /work/gradle/
+COPY ["run/*", "gradlew", "/work/"]
+RUN mkdir -p /work/gradle/wrapper && mv /work/*-wrapper.* /work/gradle/wrapper/

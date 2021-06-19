@@ -60,6 +60,8 @@ jobs:
           docker run --rm ${IMAGE_NAME}:${TAG} java --list-modules
           echo "::endgroup::"
           jar_path=$(docker run --rm ${IMAGE_NAME}:${TAG} find / -maxdepth 1 -name *.jar)
+          echo "Found jar file at $jar_path"
+          echo "Latest version of forge"
           docker run --rm ${IMAGE_NAME}:${TAG} java -jar $jar_path
       - name: Push
         run: docker push ${IMAGE_NAME}:${TAG}
