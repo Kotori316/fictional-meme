@@ -75,6 +75,9 @@ public class VersionGet {
     public static class Key {
         private final VersionString versionString;
         private final String group;
+        private static final Map<String, String> replaceMap = Map.of(
+            "recommend", "recommended"
+        );
 
         public Key(VersionString versionString, String group) {
             this.versionString = versionString;
@@ -88,7 +91,7 @@ public class VersionGet {
             var vs = new VersionString(s, givenKey);
             if (s.contains("-")) {
                 var group = s.split("-")[1];
-                return new Key(vs, group);
+                return new Key(vs, replaceMap.getOrDefault(group, group));
             } else {
                 return new Key(vs, "");
             }

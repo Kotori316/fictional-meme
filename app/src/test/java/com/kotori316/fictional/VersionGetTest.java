@@ -14,6 +14,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -138,5 +140,21 @@ class VersionGetTest {
     })
     void checkKey(String key) {
         assertFalse(App.shouldSearch(key));
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"1.1-latest", "1.7.10_pre4-latest", "1.11-recommended", "1.11-latest",
+        "1.11.2-latest", "1.12.2-recommended", "1.17.0-latest"})
+    void createKey(String keyString) {
+        var key = VersionGet.Key.fromString(keyString, false);
+        assertNotNull(key);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"1.1", "1.16.5", "1.16", "1.17", "2.0"})
+    void replaceGroup(String version) {
+        var key = VersionGet.Key.fromString(version + "-recommend", false);
+        assertEquals(VersionGet.Key.fromString(version + "-recommended", false), key);
     }
 }
