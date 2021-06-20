@@ -12,7 +12,7 @@ COPY --from=builder /fictional-meme/app/build/libs/* /
 COPY ["run/*", "gradlew", "/work/"]
 RUN mkdir -p /work/gradle/wrapper && mv /work/*-wrapper.* /work/gradle/wrapper/
 
-RUN export CI_FORGE=$(java -jar $(find / -maxdepth 1 -name "*.jar") $MINECRAFT_VERSION) && \
+RUN export CI_FORGE=$(java -jar $(find / -maxdepth 1 -name "*.jar") ${MINECRAFT_VERSION}-latest) && \
     cd /work && \
     chmod +x ./gradlew && \
     (./gradlew downloadAssets --no-daemon > /dev/null || ./gradlew downloadAssets --no-daemon > /dev/null || \
@@ -20,6 +20,10 @@ RUN export CI_FORGE=$(java -jar $(find / -maxdepth 1 -name "*.jar") $MINECRAFT_V
     (./gradlew extractNatives --no-daemon > /dev/null || ./gradlew extractNatives --no-daemon > /dev/null || \
      ./gradlew extractNatives --no-daemon > /dev/null || (sleep 15s && ./gradlew extractNatives --no-daemon)) && \
      ./gradlew runData --no-daemon
+RUN export CI_FORGE=$(java -jar $(find / -maxdepth 1 -name "*.jar") ${MINECRAFT_VERSION}-recommended) && \
+    cd /work && \
+    chmod +x ./gradlew && \
+    ./gradlew runData --no-daemon
 
 FROM adoptopenjdk:11-hotspot
 
