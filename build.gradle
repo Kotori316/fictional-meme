@@ -1,0 +1,68 @@
+plugins {
+    // https://maven.fabricmc.net/net/fabricmc/fabric-loom/
+    id 'fabric-loom' version "0.9.31"
+}
+
+archivesBaseName = "fic"
+version = "1.0"
+group = "com.kotori316"
+
+static def versionMap() {
+    return [
+            "1.17"  : [
+                    "YARN_VERSION"  : "1.17+build.13",
+                    "LOADER_VERSION": "0.11.6",
+                    "FABRIC_VERSION": "0.37.0+1.17",
+            ],
+            "1.17.1": [
+                    "YARN_VERSION"  : "1.17.1+build.9",
+                    "LOADER_VERSION": "0.11.6",
+                    "FABRIC_VERSION": "0.37.0+1.17",
+            ]
+    ]
+}
+
+static String fromEnv(String envName) {
+    def versionName = System.getenv("MINECRAFT_VERSION")
+    if (envName == "MINECRAFT_VERSION") return versionName
+    def map = versionMap().get(versionName)
+    return map.get(envName)
+}
+
+dependencies {
+    def mc = fromEnv("MINECRAFT_VERSION")
+    def yarn = fromEnv("YARN_VERSION")
+    def loader = fromEnv("LOADER_VERSION")
+    def fabric = fromEnv("FABRIC_VERSION")
+    System.out.println((String) "$mc, $yarn, $loader, $fabric")
+    minecraft "com.mojang:minecraft:$mc"
+    mappings "net.fabricmc:yarn:$yarn:v2"
+    modImplementation "net.fabricmc:fabric-loader:$loader"
+    // Fabric API. This is technically optional, but you probably want it anyway.
+    modImplementation "net.fabricmc.fabric-api:fabric-api:$fabric"
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+// ensure that the encoding is set to UTF-8, no matter what the system default is
+// this fixes some edge cases with special characters not displaying correctly
+// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+    options.release.set(16)
+}
+
+java {
+    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+    // if it is present.
+    // If you remove this line, sources will not be generated.
+    toolchain {
+        it.languageVersion = JavaLanguageVersion.of(16)
+    }
+}
