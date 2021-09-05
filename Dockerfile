@@ -20,11 +20,11 @@ RUN export CI_FORGE=$(java -jar $(find / -maxdepth 1 -name "*.jar") ${MINECRAFT_
      ./gradlew downloadAssets --no-daemon > /dev/null || (sleep 15s && ./gradlew downloadAssets --no-daemon)) && \
     (./gradlew extractNatives --no-daemon > /dev/null || ./gradlew extractNatives --no-daemon > /dev/null || \
      ./gradlew extractNatives --no-daemon > /dev/null || (sleep 15s && ./gradlew extractNatives --no-daemon)) && \
-     ./gradlew runData --no-daemon
+     ./gradlew build --no-daemon
 RUN export CI_FORGE=$(java -jar $(find / -maxdepth 1 -name "*.jar") ${MINECRAFT_VERSION}-recommended) && \
     cd /work && \
     chmod +x ./gradlew && \
-    ./gradlew runData --no-daemon
+    ./gradlew build --no-daemon
 
 FROM adoptopenjdk:${JAVA_VERSION}-hotspot
 

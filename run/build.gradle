@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
@@ -12,7 +12,11 @@ version = '1.0'
 group = 'com.kotori316' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'modid'
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+if (Integer.parseInt(System.getProperty("java.version").split("\\.")[0]) >= 16) {
+    java.toolchain.languageVersion = JavaLanguageVersion.of(16)
+} else {
+    sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+}
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
@@ -54,7 +58,7 @@ dependencies {
 
     minecraft(forgeArtifact)
 
-    def scala_version = "2.13.5"
+    def scala_version = "2.13.6"
     implementation "org.scala-lang:scala-library:${scala_version}"
     // A library of functional programing in Scala
     implementation group: 'org.typelevel', name: "cats-core_" + scala_version.substring(0, scala_version.lastIndexOf(".")), version: '2.6.0'
