@@ -74,3 +74,19 @@ dependencies {
         transitive(false)
     }
 }
+
+task printProperties() {
+    doLast {
+        List<String> list = []
+        // Version
+        list.add("CI_FORGE: ${System.getenv("CI_FORGE")}")
+        list.add("forge.version: ${getProperty("forge.version")}")
+        list.add("mapping.channel: ${getProperty("mapping.channel")}")
+        list.add("mapping.version: ${getProperty("mapping.version")}")
+        list.add("ci.mods: ${getProperty("ci.mods")}")
+        list.add("")
+        list.add("java.version: ${System.getProperty("java.version")}")
+
+        list.forEach { s -> System.out.println(s) }
+    }
+}
