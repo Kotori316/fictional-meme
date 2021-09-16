@@ -1,4 +1,4 @@
-ARG JAVA_VERSION=${JAVA_VERSION:-11}
+ARG JAVA_VERSION
 FROM eclipse-temurin:${JAVA_VERSION} as builder
 
 COPY [".", "fictional-meme/"]
@@ -8,7 +8,7 @@ RUN cd fictional-meme && \
     ./gradlew clean shadowJar
 
 FROM eclipse-temurin:${JAVA_VERSION} as cache
-ARG MINECRAFT_VERSION=${MINECRAFT_VERSION:-1.16.5}
+ARG MINECRAFT_VERSION
 COPY --from=builder /fictional-meme/app/build/libs/* /
 COPY ["run/*", "gradlew", "/work/"]
 RUN mkdir -p /work/gradle/wrapper && mv /work/*-wrapper.* /work/gradle/wrapper/
