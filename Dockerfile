@@ -1,5 +1,5 @@
 ARG JAVA_VERSION=${JAVA_VERSION:-11}
-FROM adoptopenjdk:${JAVA_VERSION}-hotspot as builder
+FROM eclipse-temurin:${JAVA_VERSION} as builder
 
 COPY [".", "fictional-meme/"]
 # Clone and Build Jar
@@ -7,7 +7,7 @@ RUN cd fictional-meme && \
     chmod +x ./gradlew && \
     ./gradlew clean shadowJar
 
-FROM adoptopenjdk:${JAVA_VERSION}-hotspot as cache
+FROM eclipse-temurin:${JAVA_VERSION} as cache
 ARG MINECRAFT_VERSION=${MINECRAFT_VERSION:-1.16.5}
 COPY --from=builder /fictional-meme/app/build/libs/* /
 COPY ["run/*", "gradlew", "/work/"]
@@ -26,8 +26,13 @@ RUN export CI_FORGE=$(java -jar $(find / -maxdepth 1 -name "*.jar") ${MINECRAFT_
     chmod +x ./gradlew && \
     ./gradlew build --no-daemon
 
-FROM adoptopenjdk:${JAVA_VERSION}-hotspot
+FROM eclipse-temurin:${JAVA_VERSION}
 
+RUN DEBIAN_FRONTEND=noninteractive \
+    && apt-get update \
+    && apt-get install -y --quiet git --no-install-recommends \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 RUN mkdir -p /work/gradle/wrapper && mkdir -p /work/build/natives && mkdir -p /root/.gradle/caches
 COPY --from=builder /fictional-meme/app/build/libs/* /
 COPY --from=cache /root/.gradle/caches/ /root/.gradle/caches/
