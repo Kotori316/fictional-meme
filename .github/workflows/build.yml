@@ -34,6 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MC_VERSION: 1.16.5
+      JAVA_VERSION: 11
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-buildx-action@v1
@@ -52,11 +53,13 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          tags: ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+            ${{ env.IMAGE_NAME }}:latest
           load: true
           build-args: |
             MINECRAFT_VERSION=${{ env.MC_VERSION }}
-            JAVA_VERSION=11
+            JAVA_VERSION=${{ env.JAVA_VERSION }}
       - name: Check java version
         run: |
           docker images
@@ -68,9 +71,10 @@ jobs:
           echo "Found jar file at $jar_path"
           echo "Latest version of forge"
           docker run --rm ${IMAGE_NAME}:${TAG} java -jar $jar_path
-          docker tag ${IMAGE_NAME}:${TAG} ${IMAGE_NAME}:latest
+          echo "Latest version of Minecraft ${{ env.MC_VERSION }}"
+          docker run --rm ${IMAGE_NAME}:${TAG} java -jar $jar_path ${{ env.MC_VERSION }}
       - name: Push1
         run: docker push ${IMAGE_NAME}:${TAG}
       - name: Push2
-        if: ${{ false }}
+        if: ${{ github.ref == 'refs/heads/master' }}
         run: docker push ${IMAGE_NAME}:latest
