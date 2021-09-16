@@ -28,6 +28,11 @@ RUN export CI_FORGE=$(java -jar $(find / -maxdepth 1 -name "*.jar") ${MINECRAFT_
 
 FROM eclipse-temurin:${JAVA_VERSION}
 
+RUN DEBIAN_FRONTEND=noninteractive \
+    && apt-get update \
+    && apt-get install -y --quiet git --no-install-recommends \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 RUN mkdir -p /work/gradle/wrapper && mkdir -p /work/build/natives && mkdir -p /root/.gradle/caches
 COPY --from=builder /fictional-meme/app/build/libs/* /
 COPY --from=cache /root/.gradle/caches/ /root/.gradle/caches/
