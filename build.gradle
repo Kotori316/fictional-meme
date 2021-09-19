@@ -12,12 +12,12 @@ static def versionMap() {
             "1.17"  : [
                     "YARN_VERSION"  : "1.17+build.13",
                     "LOADER_VERSION": "0.11.6",
-                    "FABRIC_VERSION": "0.37.0+1.17",
+                    "FABRIC_VERSION": "0.40.1+1.17",
             ],
             "1.17.1": [
                     "YARN_VERSION"  : "1.17.1+build.9",
                     "LOADER_VERSION": "0.11.6",
-                    "FABRIC_VERSION": "0.37.0+1.17",
+                    "FABRIC_VERSION": "0.40.1+1.17",
             ]
     ]
 }
