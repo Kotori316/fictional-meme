@@ -7,13 +7,15 @@ RUN cd fictional-meme && \
     chmod +x ./gradlew && \
     ./gradlew clean shadowJar
 
+# ------------------------------------------------------------------
 FROM eclipse-temurin:${JAVA_VERSION} as cache
 ARG MINECRAFT_VERSION
 COPY --from=builder /fictional-meme/app/build/libs/* /
 COPY ["run/*", "gradlew", "/work/"]
 RUN mkdir -p /work/gradle/wrapper && mv /work/*-wrapper.* /work/gradle/wrapper/
 
-RUN export CI_FORGE=$(java -jar $(find / -maxdepth 1 -name "*.jar") ${MINECRAFT_VERSION}-latest) && \
+RUN echo $(java -jar $(find / -maxdepth 1 -name "*.jar") ${MINECRAFT_VERSION}-latest) > /forge.txt
+RUN export CI_FORGE=$(cat /forge.txt) && \
     cd /work && \
     chmod +x ./gradlew && \
     (./gradlew downloadAssets --no-daemon > /dev/null || ./gradlew downloadAssets --no-daemon > /dev/null || \
@@ -21,11 +23,12 @@ RUN export CI_FORGE=$(java -jar $(find / -maxdepth 1 -name "*.jar") ${MINECRAFT_
     (./gradlew extractNatives --no-daemon > /dev/null || ./gradlew extractNatives --no-daemon > /dev/null || \
      ./gradlew extractNatives --no-daemon > /dev/null || (sleep 15s && ./gradlew extractNatives --no-daemon)) && \
      ./gradlew build --no-daemon
-RUN export CI_FORGE=$(java -jar $(find / -maxdepth 1 -name "*.jar") ${MINECRAFT_VERSION}-recommended) && \
+RUN export CI_FORGE=$(cat /forge.txt) && \
     cd /work && \
     chmod +x ./gradlew && \
     ./gradlew build --no-daemon
 
+# ------------------------------------------------------------------
 FROM eclipse-temurin:${JAVA_VERSION}
 
 RUN DEBIAN_FRONTEND=noninteractive \

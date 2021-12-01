@@ -12,11 +12,7 @@ version = '1.0'
 group = 'com.kotori316' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'modid'
 
-if (Integer.parseInt(System.getProperty("java.version").split("\\.")[0]) >= 16) {
-    java.toolchain.languageVersion = JavaLanguageVersion.of(16)
-} else {
-    sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
-}
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
@@ -25,13 +21,14 @@ minecraft {
         data {
             workingDirectory project.file('run')
             forceExit false
-            property 'forge.logging.markers', 'REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
-            property 'mixin.env.disableRefMap', 'true'
-            property "mixin.debug.export", "true"
+            property('forge.logging.markers', 'REGISTRIES,REGISTRYDUMP')
+            property('forge.logging.console.level', 'debug')
+            property('mixin.env.remapRefMap', 'true')
+            property('mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg")
+            property("mixin.debug.export", "true")
 
             String mods = System.getenv("CI_MODS") ?: getProperty("ci.mods") ?: ""
-            args '--mod', mods, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            args('--mod', mods, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/'))
         }
     }
 }
@@ -41,8 +38,10 @@ repositories {
         name = "Azure-Kotori316"
         url = uri("https://pkgs.dev.azure.com/Kotori316/minecraft/_packaging/mods/maven/v1")
         content {
-            includeModule("com.kotori316", "ScalableCatsForce".toLowerCase())
-            includeModule("com.kotori316", "ModJar")
+            it.includeModule("com.kotori316", "ScalableCatsForce".toLowerCase())
+            it.includeModule("com.kotori316", "ModJar")
+            it.includeModule("org.typelevel", "cats-core_2.13")
+            it.includeModule("org.typelevel", "cats-kernel_2.13")
         }
     }
     repositories.stream().filter { it instanceof MavenArtifactRepository }.forEach { repo ->
@@ -58,12 +57,13 @@ dependencies {
 
     minecraft(forgeArtifact)
 
-    def scala_version = "2.13.6"
+    def scala_version = "2.13.7"
     implementation "org.scala-lang:scala-library:${scala_version}"
     // A library of functional programing in Scala
-    implementation group: 'org.typelevel', name: "cats-core_" + scala_version.substring(0, scala_version.lastIndexOf(".")), version: '2.6.0'
+    implementation group: 'org.typelevel', name: "cats-core_" + scala_version.substring(0, scala_version.lastIndexOf(".")), version: '2.6.2-kotori'
 
-    implementation(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.5-build-2', classifier: 'dev')
+    compileOnly(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.7-build-1', classifier: 'dev')
+    runtimeOnly(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.7-build-1', classifier: 'with-library')
 
     String JUPITER_VERSION = System.getenv("JUPITER_VERSION") ?: '5.7.1'
     runtimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUPITER_VERSION)
