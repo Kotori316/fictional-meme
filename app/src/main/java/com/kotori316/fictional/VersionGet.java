@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
@@ -57,10 +56,10 @@ public class VersionGet {
             var allLatest = this.versionMap.entrySet().stream()
                 .filter(e -> e.getKey().group.equals("latest"))
                 .map(e -> Map.entry(e.getKey().versionString, e.getValue()))
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
             var sameMajors = allLatest.stream()
                 .filter(e -> e.getKey().equalsMajor(vKey.versionString))
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
             return sameMajors.stream().filter(e -> e.getKey().equals(vKey.versionString)).findFirst()
                 .or(() -> sameMajors.stream().max(Map.Entry.comparingByKey(VersionString.COMPARATOR)))
                 .or(() -> allLatest.stream().max(Map.Entry.comparingByKey(VersionString.COMPARATOR)))
@@ -72,23 +71,16 @@ public class VersionGet {
         }
     }
 
-    public static class Key {
-        private final VersionString versionString;
-        private final String group;
+    public record Key(VersionString versionString, String group) {
         private static final Map<String, String> replaceMap = Map.of(
             "recommend", "recommended"
         );
-
-        public Key(VersionString versionString, String group) {
-            this.versionString = versionString;
-            this.group = group;
-        }
 
         static Key fromString(String s, boolean givenKey) {
             if (s == null) {
                 return new Key(new VersionString(0, 0, 0), "latest");
             }
-            var vs = new VersionString(s, givenKey);
+            var vs = VersionString.getInstance(s, givenKey);
             if (s.contains("-")) {
                 var group = s.split("-")[1];
                 return new Key(vs, replaceMap.getOrDefault(group, group));
@@ -103,19 +95,6 @@ public class VersionGet {
                 return versionString.toString() + "-" + group;
             else
                 return versionString.toString();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Key key = (Key) o;
-            return versionString.equals(key.versionString) && group.equals(key.group);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(versionString, group);
         }
     }
 }

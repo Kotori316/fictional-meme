@@ -24,7 +24,7 @@ class VersionStringTest {
             () -> assertTrue(m.group("group").equals("recommended") || m.group("group").equals("latest"))
         );
 
-        var vs = new VersionString(input);
+        var vs = VersionString.getInstance(input);
         assertEquals("1.1", vs.toString());
     }
 
@@ -40,7 +40,7 @@ class VersionStringTest {
             () -> assertEquals("", m.group("postfix")),
             () -> assertTrue(m.group("group").equals("recommended") || m.group("group").equals("latest"))
         );
-        var vs = new VersionString(input);
+        var vs = VersionString.getInstance(input);
         assertEquals("1.5.2", vs.toString());
     }
 
@@ -56,14 +56,14 @@ class VersionStringTest {
             () -> assertEquals("_pre", m.group("postfix")),
             () -> assertTrue(m.group("group").equals("recommended") || m.group("group").equals("latest"))
         );
-        var vs = new VersionString(input);
+        var vs = VersionString.getInstance(input);
         assertEquals("1.5.2_pre", vs.toString());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"bad", "1", "1L.2.52", "1.2L.1", "1,2,3", "1.3."})
     void badInput(String input) {
-        assertThrows(IllegalArgumentException.class, () -> new VersionString(input));
+        assertThrows(IllegalArgumentException.class, () -> VersionString.getInstance(input));
     }
 
     @Test
