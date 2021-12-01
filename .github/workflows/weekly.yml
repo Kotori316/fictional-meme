@@ -1,8 +1,6 @@
 name: Weekly Build for 1.17.1
 
 on:
-  schedule:
-    - cron: "0 0 * * 1,4"
   workflow_dispatch:
 
 jobs:
