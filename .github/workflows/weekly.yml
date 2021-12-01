@@ -1,14 +1,16 @@
-name: Weekly Build for 1.17.1
+name: Weekly Build for 1.18
 
 on:
+  schedule:
+    - cron: "0 5 * * *"
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      MC_VERSION: 1.17.1
-      JAVA_VERSION: 16
+      MC_VERSION: 1.18
+      JAVA_VERSION: 17
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-buildx-action@v1
