@@ -9,3 +9,4 @@
 
 rootProject.name = 'fictional-meme'
 include('app')
+include('v-get')

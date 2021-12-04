@@ -37,7 +37,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 RUN mkdir -p /work/gradle/wrapper && mkdir -p /work/build/natives && mkdir -p /root/.gradle/caches
-COPY --from=builder /fictional-meme/app/build/libs/* /
+COPY --from=builder ["/fictional-meme/app/build/libs/*", "/fictional-meme/v-get/build/libs/*", "/"]
 COPY --from=cache /root/.gradle/caches/ /root/.gradle/caches/
 COPY --from=cache /work/build/natives/ /work/build/natives/
 COPY ["run/*", "gradlew", "/work/"]

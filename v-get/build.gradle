@@ -1,0 +1,38 @@
+plugins {
+    // Apply the application plugin to add support for building a CLI application in Java.
+    id 'application'
+    id "com.github.johnrengelman.shadow" version "7.0.0"
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+repositories {
+    mavenCentral()
+}
+
+group = 'com.kotori316'
+archivesBaseName = "v-get"
+version = "1.0"
+
+dependencies {
+    String JUPITER_VERSION = '5.7.0'
+    // Use JUnit Jupiter API for testing.
+    testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUPITER_VERSION)
+    testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: JUPITER_VERSION)
+
+    // Use JUnit Jupiter Engine for testing.
+    testRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine')
+
+    // This dependency is used by the application.
+}
+
+tasks.named('test') {
+    // Use junit platform for unit tests.
+    useJUnitPlatform()
+}
+
+application {
+    // Define the main class for the application.
+    String mainName = "com.kotori316.maven.VersionGet"
+    mainClass.set(mainName)
+    mainModule.set("fictional.maven")
+}
