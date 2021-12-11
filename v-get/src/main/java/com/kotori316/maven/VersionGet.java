@@ -23,7 +23,7 @@ public final class VersionGet {
         if (version.toLowerCase(Locale.ROOT).contains("snapshot")) {
             return;
         }
-        String mavenUrl = args[1];
+        String mavenUrl = fixUrl(args[1]);
         var versionList = readVersions(mavenUrl);
         if (versionList.stream().map(String::toLowerCase)
             .anyMatch(Predicate.isEqual(version.toLowerCase(Locale.ROOT)))) {
@@ -34,7 +34,7 @@ public final class VersionGet {
         }
     }
 
-    private static List<String> readVersions(String url) {
+    static List<String> readVersions(String url) {
         try {
             var factory = DocumentBuilderFactory.newInstance();
             var builder = factory.newDocumentBuilder();
@@ -52,6 +52,15 @@ public final class VersionGet {
                 .toList();
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    static String fixUrl(String original) {
+        if (original.endsWith(".xml")) {
+            return original;
+        } else {
+            String append = (original.endsWith("/") ? "" : "/") + "maven-metadata.xml";
+            return original + append;
         }
     }
 }
