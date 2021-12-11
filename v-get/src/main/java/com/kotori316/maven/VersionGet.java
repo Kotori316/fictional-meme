@@ -16,6 +16,7 @@ public final class VersionGet {
                 Parameters:
                   Version: the version to check the existence
                   URL: the URL to version list of maven.""");
+            System.exit(1);
             return;
         }
         String version = args[0];
