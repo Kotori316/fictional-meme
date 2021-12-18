@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.util.AbstractMap;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.google.gson.Gson;
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -55,8 +53,8 @@ class VersionGetTest {
 
     @Test
     void dummy() {
-        assertTrue(getLatest().count() > 0);
-        assertTrue(getPresentKey().count() > 0);
+        assertTrue(getLatest().findAny().isPresent());
+        assertTrue(getPresentKey().findAny().isPresent());
     }
 
     static Stream<String[]> getLatest() {
@@ -81,11 +79,13 @@ class VersionGetTest {
             Map.entry("1.10.0", "12.18.0.2000"),
             Map.entry("1.10.2", "12.18.3.2511"),
             Map.entry("1.10", "12.18.3.2511"),
-            Map.entry("1.14", "28.2.23"),
+            Map.entry("1.14", "28.2.26"),
             Map.entry("1.15.0", "29.0.4"),
-            Map.entry("1.15", "31.2.50"),
-            Map.entry("1.17", "37.0.0"),
-            new AbstractMap.SimpleImmutableEntry<String, String>(null, "37.0.0")
+            Map.entry("1.15", "31.2.57"),
+            Map.entry("1.17", "37.1.1"),
+            Map.entry("1.18.0", "38.0.17"),
+            Map.entry("1.18", "39.0.5"),
+            new AbstractMap.SimpleImmutableEntry<String, String>(null, "39.0.5")
         ).map(e -> new String[]{e.getKey(), e.getValue()});
     }
 
@@ -104,8 +104,10 @@ class VersionGetTest {
             Map.entry("1.11-recommended", "1.11-13.19.1.2189"),
             Map.entry("1.11-latest", "1.11-13.19.1.2199"),
             Map.entry("1.11.2-latest", "1.11.2-13.20.1.2588"),
-            Map.entry("1.12.2-recommended", "1.12.2-14.23.5.2855"),
-            Map.entry("1.17.0-latest", "1.17-37.0.0")
+            Map.entry("1.12.2-recommended", "1.12.2-14.23.5.2859"),
+            Map.entry("1.18.0-latest", "1.18-38.0.17"),
+            Map.entry("1.18-latest", "1.18-38.0.17"), // This is not valid.
+            Map.entry("1.18.1-latest", "1.18.1-39.0.5")
         ).map(e -> new String[]{e.getKey(), e.getValue()});
     }
 
@@ -119,9 +121,9 @@ class VersionGetTest {
     void notExistLatest() {
         assertAll(
             () -> assertEquals("1.7.10-10.13.4.1614", vg.getLatest("1.7.5-latest")),
-            () -> assertEquals("1.16.5-36.1.23", vg.getLatest("1.16-latest")),
-            () -> assertEquals("1.17-37.0.0", vg.getLatest("1.18")),
-            () -> assertEquals("1.17-37.0.0", vg.getLatest("2.0"))
+            () -> assertEquals("1.16.5-36.2.22", vg.getLatest("1.16-latest")),
+            () -> assertEquals("1.18.1-39.0.5", vg.getLatest("1.30")),
+            () -> assertEquals("1.18.1-39.0.5", vg.getLatest("2.0"))
         );
     }
 
