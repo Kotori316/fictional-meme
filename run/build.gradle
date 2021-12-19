@@ -1,13 +1,16 @@
 buildscript {
     repositories {
         maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://maven.parchmentmc.org' }
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath 'org.parchmentmc:librarian:1.+'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
 version = '1.0'
 group = 'com.kotori316' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'modid'
@@ -16,7 +19,12 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
-    mappings channel: getProperty("mapping.channel"), version: getProperty("mapping.version")
+    if (System.getenv("PARCHMENT_ENABLED") == null) {
+        mappings channel: project.mapping_channel, version: project.mapping_version
+    } else {
+        mappings channel: project.mapping_channel, version: project.parchment_mapping
+    }
+
     runs {
         data {
             workingDirectory project.file('run')
@@ -81,8 +89,9 @@ task printProperties() {
         // Version
         list.add("CI_FORGE: ${System.getenv("CI_FORGE")}")
         list.add("forge.version: ${getProperty("forge.version")}")
-        list.add("mapping.channel: ${getProperty("mapping.channel")}")
-        list.add("mapping.version: ${getProperty("mapping.version")}")
+        list.add("mapping_channel: ${project.mapping_channel}")
+        list.add("mapping_version: ${project.mapping_version}")
+        list.add("parchment_mapping: ${project.parchment_mapping}")
         list.add("ci.mods: ${getProperty("ci.mods")}")
         list.add("")
         list.add("java.version: ${System.getProperty("java.version")}")

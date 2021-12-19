@@ -14,7 +14,7 @@ COPY --from=builder /fictional-meme/app/build/libs/* /
 COPY ["run/*", "gradlew", "/work/"]
 RUN mkdir -p /work/gradle/wrapper && mv /work/*-wrapper.* /work/gradle/wrapper/
 
-RUN echo $(java -jar $(find / -maxdepth 1 -name "*.jar") ${MINECRAFT_VERSION}-latest) > /forge.txt
+RUN echo $(java -jar $(find / -maxdepth 1 -name "*.jar") ${MINECRAFT_VERSION}) > /forge.txt
 RUN export CI_FORGE=$(cat /forge.txt) && \
     cd /work && \
     chmod +x ./gradlew && \
@@ -26,12 +26,14 @@ RUN export CI_FORGE=$(cat /forge.txt) && \
 RUN export CI_FORGE=$(cat /forge.txt) && \
     cd /work && \
     chmod +x ./gradlew && \
-    ./gradlew build --no-daemon
+    ./gradlew build --no-daemon && \
+    sed "s:mapping_channel=.*:mapping_channel=parchment:g" gradle.properties && \
+    PARCHMENT_ENABLED=true ./gradlew build --no-daemon
 
 # ------------------------------------------------------------------
 FROM eclipse-temurin:${JAVA_VERSION}
 
-RUN DEBIAN_FRONTEND=noninteractive \
+RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
     && apt-get install -y --quiet git --no-install-recommends \
     && apt-get clean \
