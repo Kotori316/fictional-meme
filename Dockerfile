@@ -27,7 +27,7 @@ RUN export CI_FORGE=$(cat /forge.txt) && \
     cd /work && \
     chmod +x ./gradlew && \
     ./gradlew build --no-daemon && \
-    sed "s:mapping_channel=.*:mapping_channel=parchment:g" gradle.properties && \
+    sed -i "s:mapping_channel=.*:mapping_channel=parchment:g" gradle.properties && \
     PARCHMENT_ENABLED=true ./gradlew build --no-daemon
 
 # ------------------------------------------------------------------
