@@ -18,10 +18,8 @@ RUN echo $(java -jar $(find / -maxdepth 1 -name "*.jar") ${MINECRAFT_VERSION}) >
 RUN export CI_FORGE=$(cat /forge.txt) && \
     cd /work && \
     chmod +x ./gradlew && \
-    (./gradlew downloadAssets --no-daemon > /dev/null || ./gradlew downloadAssets --no-daemon > /dev/null || \
-     ./gradlew downloadAssets --no-daemon > /dev/null || (sleep 15s && ./gradlew downloadAssets --no-daemon)) && \
-    (./gradlew extractNatives --no-daemon > /dev/null || ./gradlew extractNatives --no-daemon > /dev/null || \
-     ./gradlew extractNatives --no-daemon > /dev/null || (sleep 15s && ./gradlew extractNatives --no-daemon)) && \
+    (./gradlew prepareRuns --no-daemon > /dev/null || ./gradlew prepareRuns --no-daemon > /dev/null || \
+     ./gradlew prepareRuns --no-daemon > /dev/null || (sleep 15s && ./gradlew prepareRuns --no-daemon)) && \
      ./gradlew build --no-daemon
 RUN export CI_FORGE=$(cat /forge.txt) && \
     cd /work && \
