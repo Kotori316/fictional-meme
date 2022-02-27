@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install Python dependencies
-        run: python3 -m pip install requests -y
+        run: python3 -m pip install requests
       - name: Run clean
         run: python3 ./clean_container.py
         env:
