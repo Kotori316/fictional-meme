@@ -1,0 +1,20 @@
+name: Weekly Cleaner
+
+on:
+  schedule:
+    - cron: "0 6 * * TUE"
+  workflow_dispatch:
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Python dependencies
+        run: python3 -m pip install requests -y
+      - name: Run clean
+        run: python3 ./clean_container.py
+        env:
+          USER_NAME: ${{ github.repository_owner }}
+          PACKAGE_NAME: fictional-meme%2Ffictional-meme
+          TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
