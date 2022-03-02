@@ -33,7 +33,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      MC_VERSION: 1.18.1
+      MC_VERSION: 1.18.2
       JAVA_VERSION: 17
     steps:
       - uses: actions/checkout@v2
