@@ -32,7 +32,7 @@ minecraft {
     if (System.getenv("PARCHMENT_ENABLED") == null) {
         mappings channel: project.mapping_channel, version: project.mapping_version
     } else {
-        mappings channel: project.mapping_channel, version: project.parchment_mapping
+        mappings channel: project.mapping_channel, version: (project.parchment_mapping + "-" + project.mapping_version)
     }
 
     runs {

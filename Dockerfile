@@ -15,25 +15,22 @@ COPY ["run/*", "gradlew", "/work/"]
 RUN mkdir -p /work/gradle/wrapper && mv /work/*-wrapper.* /work/gradle/wrapper/
 
 RUN echo $(java -jar $(find / -maxdepth 1 -name "*.jar") ${MINECRAFT_VERSION}) > /forge.txt
+WORKDIR /work
+
 RUN export CI_FORGE=$(cat /forge.txt) && \
-    cd /work && \
     chmod +x ./gradlew && \
     (./gradlew prepareRuns --no-daemon > /dev/null || ./gradlew prepareRuns --no-daemon > /dev/null || \
      ./gradlew prepareRuns --no-daemon > /dev/null || (sleep 15s && ./gradlew prepareRuns --no-daemon)) && \
      ./gradlew build --no-daemon
-RUN export CI_FORGE=$(cat /forge.txt) && \
-    cd /work && \
-    chmod +x ./gradlew && \
-    ./gradlew build --no-daemon && \
-    sed -i "s:mapping_channel=.*:mapping_channel=parchment:g" gradle.properties && \
-    PARCHMENT_ENABLED=true ./gradlew build --no-daemon
+
+RUN sed -i "s:mapping_channel=.*:mapping_channel=parchment:g" gradle.properties && \
+    CI_FORGE=$(cat /forge.txt) PARCHMENT_ENABLED=true ./gradlew build --no-daemon
 
 # ------------------------------------------------------------------
 FROM eclipse-temurin:${JAVA_VERSION}
 
-RUN export DEBIAN_FRONTEND=noninteractive \
-    && apt-get update \
-    && apt-get install -y --quiet git --no-install-recommends \
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --quiet git --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 RUN mkdir -p /work/gradle/wrapper && mkdir -p /work/build/natives && mkdir -p /root/.gradle/caches
