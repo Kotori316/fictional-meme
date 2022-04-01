@@ -9,7 +9,8 @@ jobs:
   clean:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Get script
+        run: curl -LO https://raw.githubusercontent.com/Kotori316/fictional-meme/master/clean_container.py
       - name: Install Python dependencies
         run: python3 -m pip install requests
       - name: Clean fictional-meme
