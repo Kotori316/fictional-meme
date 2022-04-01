@@ -12,9 +12,21 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install Python dependencies
         run: python3 -m pip install requests
+      - name: Clean fictional-meme
+        run: python3 ./clean_container.py
+        env:
+          USER_NAME: Kotori316
+          PACKAGE_NAME: fictional-meme%2Ffictional-meme
+          TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
       - name: Run clean
         run: python3 ./clean_container.py
         env:
-          USER_NAME: ${{ github.repository_owner }}
-          PACKAGE_NAME: fictional-meme%2Ffictional-meme
-          TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
+          USER_NAME: Kotori316
+          PACKAGE_NAME: DownloadCounts%2Fdlcount
+          TOKEN_GITHUB: ${{ secrets.PAT_TOKEN }}
+      - name: Clean dl_container
+        run: python3 ./clean_container.py
+        env:
+          USER_NAME: Kotori316
+          PACKAGE_NAME: dl_container
+          TOKEN_GITHUB: ${{ secrets.PAT_TOKEN }}
