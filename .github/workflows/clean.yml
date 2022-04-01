@@ -19,7 +19,7 @@ jobs:
           USER_NAME: Kotori316
           PACKAGE_NAME: fictional-meme%2Ffictional-meme
           TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run clean
+      - name: Clean dlcount
         run: python3 ./clean_container.py
         env:
           USER_NAME: Kotori316
