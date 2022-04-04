@@ -37,5 +37,6 @@ RUN mkdir -p /work/gradle/wrapper && mkdir -p /work/build/natives && mkdir -p /r
 COPY --from=builder ["/fictional-meme/app/build/libs/*", "/fictional-meme/v-get/build/libs/*", "/"]
 COPY --from=cache /root/.gradle/caches/ /root/.gradle/caches/
 COPY --from=cache /work/build/natives/ /work/build/natives/
+COPY --from=cache /forge.txt /forge.txt
 COPY ["run/*", "gradlew", "/work/"]
 RUN mv /work/*-wrapper.* /work/gradle/wrapper/
