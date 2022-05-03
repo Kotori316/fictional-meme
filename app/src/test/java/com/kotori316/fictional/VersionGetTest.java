@@ -1,10 +1,10 @@
 package com.kotori316.fictional;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.util.AbstractMap;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import com.google.gson.Gson;
@@ -29,11 +29,11 @@ class VersionGetTest {
 
     @BeforeAll
     static void setup() {
-        var inputStream = VersionGetTest.class.getResourceAsStream("/versions.json");
+        InputStream inputStream = VersionGetTest.class.getResourceAsStream("/versions.json");
         assertNotNull(inputStream);
-        var gson = new Gson();
-        try (var reader = new InputStreamReader(inputStream)) {
-            var json = gson.fromJson(reader, JsonObject.class);
+        Gson gson = new Gson();
+        try (InputStreamReader reader = new InputStreamReader(inputStream)) {
+            JsonObject json = gson.fromJson(reader, JsonObject.class);
             vg = new VersionGet(json);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -42,7 +42,7 @@ class VersionGetTest {
 
     @Test
     void createStubInstance() {
-        var vg = new VersionGet(new JsonObject());
+        VersionGet vg = new VersionGet(new JsonObject());
         assertNotNull(vg);
     }
 
@@ -59,32 +59,32 @@ class VersionGetTest {
 
     static Stream<String[]> getLatest() {
         return Stream.of(
-            Map.entry("1.1", "1.3.4.29"),
-            Map.entry("1.2", "3.4.9.171"),
-            Map.entry("1.2.5", "3.4.9.171"),
-            Map.entry("1.2.3", "1.4.1.64"),
-            Map.entry("1.3", "4.3.5.318"),
-            Map.entry("1.3.2", "4.3.5.318"),
-            Map.entry("1.4.0", "5.0.0.326"),
-            Map.entry("1.4.3", "6.2.1.358"),
-            Map.entry("1.4.7", "6.6.2.534"),
-            Map.entry("1.4", "6.6.2.534"),
-            Map.entry("1.5.0", "7.7.0.598"),
-            Map.entry("1.5", "7.8.1.738"),
-            Map.entry("1.7.10", "10.13.4.1614"),
-            Map.entry("1.7", "10.13.4.1614"),
-            Map.entry("1.7.2", "10.12.2.1161"),
-            Map.entry("1.8", "11.15.1.2318"),
-            Map.entry("1.8.0", "11.14.4.1577"),
-            Map.entry("1.10.0", "12.18.0.2000"),
-            Map.entry("1.10.2", "12.18.3.2511"),
-            Map.entry("1.10", "12.18.3.2511"),
-            Map.entry("1.14", "28.2.26"),
-            Map.entry("1.15.0", "29.0.4"),
-            Map.entry("1.15", "31.2.57"),
-            Map.entry("1.17", "37.1.1"),
-            Map.entry("1.18.0", "38.0.17"),
-            Map.entry("1.18", "39.0.5"),
+            new AbstractMap.SimpleImmutableEntry<>("1.1", "1.3.4.29"),
+            new AbstractMap.SimpleImmutableEntry<>("1.2", "3.4.9.171"),
+            new AbstractMap.SimpleImmutableEntry<>("1.2.5", "3.4.9.171"),
+            new AbstractMap.SimpleImmutableEntry<>("1.2.3", "1.4.1.64"),
+            new AbstractMap.SimpleImmutableEntry<>("1.3", "4.3.5.318"),
+            new AbstractMap.SimpleImmutableEntry<>("1.3.2", "4.3.5.318"),
+            new AbstractMap.SimpleImmutableEntry<>("1.4.0", "5.0.0.326"),
+            new AbstractMap.SimpleImmutableEntry<>("1.4.3", "6.2.1.358"),
+            new AbstractMap.SimpleImmutableEntry<>("1.4.7", "6.6.2.534"),
+            new AbstractMap.SimpleImmutableEntry<>("1.4", "6.6.2.534"),
+            new AbstractMap.SimpleImmutableEntry<>("1.5.0", "7.7.0.598"),
+            new AbstractMap.SimpleImmutableEntry<>("1.5", "7.8.1.738"),
+            new AbstractMap.SimpleImmutableEntry<>("1.7.10", "10.13.4.1614"),
+            new AbstractMap.SimpleImmutableEntry<>("1.7", "10.13.4.1614"),
+            new AbstractMap.SimpleImmutableEntry<>("1.7.2", "10.12.2.1161"),
+            new AbstractMap.SimpleImmutableEntry<>("1.8", "11.15.1.2318"),
+            new AbstractMap.SimpleImmutableEntry<>("1.8.0", "11.14.4.1577"),
+            new AbstractMap.SimpleImmutableEntry<>("1.10.0", "12.18.0.2000"),
+            new AbstractMap.SimpleImmutableEntry<>("1.10.2", "12.18.3.2511"),
+            new AbstractMap.SimpleImmutableEntry<>("1.10", "12.18.3.2511"),
+            new AbstractMap.SimpleImmutableEntry<>("1.14", "28.2.26"),
+            new AbstractMap.SimpleImmutableEntry<>("1.15.0", "29.0.4"),
+            new AbstractMap.SimpleImmutableEntry<>("1.15", "31.2.57"),
+            new AbstractMap.SimpleImmutableEntry<>("1.17", "37.1.1"),
+            new AbstractMap.SimpleImmutableEntry<>("1.18.0", "38.0.17"),
+            new AbstractMap.SimpleImmutableEntry<>("1.18", "39.0.5"),
             new AbstractMap.SimpleImmutableEntry<String, String>(null, "39.0.5")
         ).map(e -> new String[]{e.getKey(), e.getValue()});
     }
@@ -92,22 +92,22 @@ class VersionGetTest {
     @ParameterizedTest
     @MethodSource
     void getLatest(String key, String ans) {
-        var actual = vg.getLatest(key);
+        String actual = vg.getLatest(key);
         assertTrue(actual.contains(ans),
             String.format("Actual %s, expected %s, key=%s", actual, ans, key));
     }
 
     static Stream<String[]> getPresentKey() {
         return Stream.of(
-            Map.entry("1.1-latest", "1.1-1.3.4.29"),
-            Map.entry("1.7.10_pre4-latest", "1.7.10_pre4-10.12.2.1149"),
-            Map.entry("1.11-recommended", "1.11-13.19.1.2189"),
-            Map.entry("1.11-latest", "1.11-13.19.1.2199"),
-            Map.entry("1.11.2-latest", "1.11.2-13.20.1.2588"),
-            Map.entry("1.12.2-recommended", "1.12.2-14.23.5.2859"),
-            Map.entry("1.18.0-latest", "1.18-38.0.17"),
-            Map.entry("1.18-latest", "1.18-38.0.17"), // This is not valid.
-            Map.entry("1.18.1-latest", "1.18.1-39.0.5")
+            new AbstractMap.SimpleImmutableEntry<>("1.1-latest", "1.1-1.3.4.29"),
+            new AbstractMap.SimpleImmutableEntry<>("1.7.10_pre4-latest", "1.7.10_pre4-10.12.2.1149"),
+            new AbstractMap.SimpleImmutableEntry<>("1.11-recommended", "1.11-13.19.1.2189"),
+            new AbstractMap.SimpleImmutableEntry<>("1.11-latest", "1.11-13.19.1.2199"),
+            new AbstractMap.SimpleImmutableEntry<>("1.11.2-latest", "1.11.2-13.20.1.2588"),
+            new AbstractMap.SimpleImmutableEntry<>("1.12.2-recommended", "1.12.2-14.23.5.2859"),
+            new AbstractMap.SimpleImmutableEntry<>("1.18.0-latest", "1.18-38.0.17"),
+            new AbstractMap.SimpleImmutableEntry<>("1.18-latest", "1.18-38.0.17"), // This is not valid.
+            new AbstractMap.SimpleImmutableEntry<>("1.18.1-latest", "1.18.1-39.0.5")
         ).map(e -> new String[]{e.getKey(), e.getValue()});
     }
 
@@ -130,7 +130,7 @@ class VersionGetTest {
     @ParameterizedTest
     @MethodSource({"getPresentKey", "getLatest"})
     void notFound(String input) {
-        var vg = new VersionGet(new JsonObject());
+        VersionGet vg = new VersionGet(new JsonObject());
         assertThrows(IllegalArgumentException.class, () -> vg.getLatest(input));
     }
 
@@ -149,14 +149,14 @@ class VersionGetTest {
     @ValueSource(strings = {"1.1-latest", "1.7.10_pre4-latest", "1.11-recommended", "1.11-latest",
         "1.11.2-latest", "1.12.2-recommended", "1.17.0-latest"})
     void createKey(String keyString) {
-        var key = VersionGet.Key.fromString(keyString, false);
+        VersionGet.Key key = VersionGet.Key.fromString(keyString, false);
         assertNotNull(key);
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"1.1", "1.16.5", "1.16", "1.17", "2.0"})
     void replaceGroup(String version) {
-        var key = VersionGet.Key.fromString(version + "-recommend", false);
+        VersionGet.Key key = VersionGet.Key.fromString(version + "-recommend", false);
         assertEquals(VersionGet.Key.fromString(version + "-recommended", false), key);
     }
 }

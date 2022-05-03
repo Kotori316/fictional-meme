@@ -1,14 +1,15 @@
 package com.kotori316.fictional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class App {
     public static void main(String[] args) {
         List<String> results;
         if (args.length == 0) {
-            var vg = new VersionGet();
-            results = List.of(vg.getLatest(null));
+            VersionGet vg = new VersionGet();
+            results = Collections.singletonList(vg.getLatest(null));
         } else {
             results = getVersions(args);
         }
@@ -35,9 +36,9 @@ public class App {
     }
 
     static boolean shouldSearch(String key) {
-        var split = key.split("-", 2);
+        String[] split = key.split("-", 2);
         if (split.length == 2) {
-            var maybeVersion = split[1].split("\\.");
+            String[] maybeVersion = split[1].split("\\.");
             return maybeVersion.length <= 2;
         }
         return true;

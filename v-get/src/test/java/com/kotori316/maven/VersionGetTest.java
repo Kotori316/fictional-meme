@@ -1,5 +1,7 @@
 package com.kotori316.maven;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -53,7 +55,7 @@ class VersionGetTest {
 
         @Test
         void readVersionTest1() {
-            var versions = VersionGet.readVersions(CAT_CORE_URL);
+            List<String> versions = VersionGet.readVersions(CAT_CORE_URL);
             assertTrue(versions.contains("2.6.2-kotori"), "2.6.2-kotori");
             assertTrue(versions.contains("2.7.1-kotori"), "2.7.1-kotori");
             assertFalse(versions.contains(null), "null");
@@ -61,7 +63,7 @@ class VersionGetTest {
 
         @Test
         void readVersionTest2() {
-            var versions = VersionGet.readVersions(VersionGet.fixUrl(SLP_URL));
+            List<String> versions = VersionGet.readVersions(VersionGet.fixUrl(SLP_URL));
             assertTrue(versions.stream().allMatch(s -> s.contains("build")));
         }
     }

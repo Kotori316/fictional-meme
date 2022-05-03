@@ -1,10 +1,18 @@
 package com.kotori316.fictional;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.net.URL;
+import java.util.AbstractMap;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
@@ -24,18 +32,18 @@ public class VersionGet {
 
     static Map<Key, String> makeMap(JsonObject object) {
         return object.entrySet().stream().map(e -> {
-            var key = Key.fromString(e.getKey(), false);
-            var value = e.getValue().getAsString();
-            return Map.entry(key, value);
+            Key key = Key.fromString(e.getKey(), false);
+            String value = e.getValue().getAsString();
+            return new AbstractMap.SimpleImmutableEntry<>(key, value);
         }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     static JsonObject getContent() {
         try {
-            var apiUrl = new URL(VersionGet.TARGET);
-            try (var inputStream = apiUrl.openStream();
-                 var reader = new InputStreamReader(inputStream)) {
-                var gson = new Gson();
+            URL apiUrl = new URL(VersionGet.TARGET);
+            try (InputStream inputStream = apiUrl.openStream();
+                 InputStreamReader reader = new InputStreamReader(inputStream)) {
+                Gson gson = new Gson();
                 return gson.fromJson(reader, JsonObject.class).getAsJsonObject("promos");
             }
         } catch (IOException e) {
@@ -44,7 +52,7 @@ public class VersionGet {
     }
 
     public String getLatest(String s) {
-        var key1 = Key.fromString(s, false);
+        Key key1 = Key.fromString(s, false);
         if (this.versionMap.containsKey(key1)) // User gave correct key in version list.
             return getLatest(key1);
         else // We should search the matched version with the given parameter.
@@ -53,36 +61,58 @@ public class VersionGet {
 
     private String getLatest(Key vKey) {
         if (!this.versionMap.containsKey(vKey)) {
-            var allLatest = this.versionMap.entrySet().stream()
+            List<Map.Entry<VersionString, String>> allLatest = this.versionMap.entrySet().stream()
                 .filter(e -> e.getKey().group.equals("latest"))
-                .map(e -> Map.entry(e.getKey().versionString, e.getValue()))
-                .toList();
-            var sameMajors = allLatest.stream()
+                .map(e -> new AbstractMap.SimpleImmutableEntry<>(e.getKey().versionString, e.getValue()))
+                .collect(Collectors.toList());
+            List<Map.Entry<VersionString, String>> sameMajors = allLatest.stream()
                 .filter(e -> e.getKey().equalsMajor(vKey.versionString))
-                .toList();
-            return sameMajors.stream().filter(e -> e.getKey().equals(vKey.versionString)).findFirst()
-                .or(() -> sameMajors.stream().max(Map.Entry.comparingByKey(VersionString.COMPARATOR)))
-                .or(() -> allLatest.stream().max(Map.Entry.comparingByKey(VersionString.COMPARATOR)))
+                .collect(Collectors.toList());
+            return or(
+                () -> sameMajors.stream().filter(e -> e.getKey().equals(vKey.versionString)).findFirst(),
+                () -> sameMajors.stream().max(Map.Entry.comparingByKey(VersionString.COMPARATOR)),
+                () -> allLatest.stream().max(Map.Entry.comparingByKey(VersionString.COMPARATOR))
+            )
                 .map(e -> e.getKey().toString() + "-" + e.getValue())
                 .orElseThrow(() -> new IllegalArgumentException("No compatible version found for " + vKey));
         } else {
-            var version = this.versionMap.get(vKey);
+            String version = this.versionMap.get(vKey);
             return vKey.versionString.toString() + "-" + version;
         }
     }
 
-    public record Key(VersionString versionString, String group) {
-        private static final Map<String, String> replaceMap = Map.of(
-            "recommend", "recommended"
-        );
+    private static <T> Optional<T> or(Supplier<Optional<T>> o1, Supplier<Optional<T>> o2, Supplier<Optional<T>> o3) {
+        Optional<T> t1 = o1.get();
+        if (t1.isPresent()) return t1;
+        Optional<T> t2 = o2.get();
+        if (t2.isPresent()) return t2;
+        return o3.get();
+    }
+
+    public static final class Key {
+        private static final Map<String, String> replaceMap;
+
+        static {
+            Map<String, String> m = new HashMap<>();
+            m.put("recommend", "recommended");
+            replaceMap = Collections.unmodifiableMap(m);
+        }
+
+        private final VersionString versionString;
+        private final String group;
+
+        public Key(VersionString versionString, String group) {
+            this.versionString = versionString;
+            this.group = group;
+        }
 
         static Key fromString(String s, boolean givenKey) {
             if (s == null) {
                 return new Key(new VersionString(0, 0, 0), "latest");
             }
-            var vs = VersionString.getInstance(s, givenKey);
+            VersionString vs = VersionString.getInstance(s, givenKey);
             if (s.contains("-")) {
-                var group = s.split("-")[1];
+                String group = s.split("-")[1];
                 return new Key(vs, replaceMap.getOrDefault(group, group));
             } else {
                 return new Key(vs, "");
@@ -96,5 +126,20 @@ public class VersionGet {
             else
                 return versionString.toString();
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            Key that = (Key) obj;
+            return Objects.equals(this.versionString, that.versionString) &&
+                   Objects.equals(this.group, that.group);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(versionString, group);
+        }
+
     }
 }

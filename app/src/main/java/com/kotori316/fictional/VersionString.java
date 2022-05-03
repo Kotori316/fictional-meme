@@ -1,10 +1,11 @@
 package com.kotori316.fictional;
 
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public record VersionString(int top, int major, int minor, String postfix) {
+public final class VersionString {
     static final Pattern VERSION_PATTERN_WITH_GROUP = Pattern.compile(
         "(?<top>\\d)\\.(?<major>\\d+)(?:|\\.(?<minor>\\d+)(?<postfix>.*))-(?<group>\\w+)"
     );
@@ -28,11 +29,11 @@ public record VersionString(int top, int major, int minor, String postfix) {
             m = VERSION_PATTERN.matcher(s);
         }
         if (m.matches()) {
-            var top = Integer.parseInt(m.group("top"));
-            var major = Integer.parseInt(m.group("major"));
-            var minor = m.group("minor") == null ? (ignoreMinor ? -1 : 0) : Integer.parseInt(m.group("minor"));
-            var post = m.group("postfix");
-            var postfix = post == null ? "" : post;
+            int top = Integer.parseInt(m.group("top"));
+            int major = Integer.parseInt(m.group("major"));
+            int minor = m.group("minor") == null ? (ignoreMinor ? -1 : 0) : Integer.parseInt(m.group("minor"));
+            String post = m.group("postfix");
+            String postfix = post == null ? "" : post;
             return new VersionString(top, major, minor, postfix);
         } else {
             throw new IllegalArgumentException("Bad version " + s);
@@ -56,9 +57,53 @@ public record VersionString(int top, int major, int minor, String postfix) {
         }
     }
 
+    public int top() {
+        return top;
+    }
+
+    public int major() {
+        return major;
+    }
+
+    public int minor() {
+        return minor;
+    }
+
+    public String postfix() {
+        return postfix;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        VersionString that = (VersionString) obj;
+        return this.top == that.top &&
+            this.major == that.major &&
+            this.minor == that.minor &&
+            Objects.equals(this.postfix, that.postfix);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(top, major, minor, postfix);
+    }
+
+
     public static final Comparator<VersionString> COMPARATOR =
         Comparator.comparingInt(VersionString::top)
             .thenComparingInt(VersionString::major)
             .thenComparingInt(VersionString::minor)
             .thenComparing(Comparator.comparing(VersionString::postfix).reversed());
+    private final int top;
+    private final int major;
+    private final int minor;
+    private final String postfix;
+
+    public VersionString(int top, int major, int minor, String postfix) {
+        this.top = top;
+        this.major = major;
+        this.minor = minor;
+        this.postfix = postfix;
+    }
 }
