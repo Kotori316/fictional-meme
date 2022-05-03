@@ -19,18 +19,11 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Get image name
-        run: |
-          i=ghcr.io/${{ github.repository }}/fictional-meme
-          echo "IMAGE_NAME=${i,,}" >> $GITHUB_ENV
-          t=${{ env.MC_VERSION }}
-          echo "TAG=${t,,}" >> $GITHUB_ENV
       - name: Build
         uses: docker/build-push-action@v2
         with:
           context: .
-          tags: |
-            ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          tags: ghcr.io/kotori316/fictional-meme/fictional-meme:${{ env.MC_VERSION }}
           push: true
           build-args: |
             MINECRAFT_VERSION=${{ env.MC_VERSION }}
