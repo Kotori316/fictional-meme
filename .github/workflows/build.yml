@@ -41,7 +41,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      MC_VERSION: 1.18.2
+      MC_VERSION: 1.19
       JAVA_VERSION: 17
     steps:
       - uses: actions/checkout@v2
@@ -68,6 +68,7 @@ jobs:
           build-args: |
             MINECRAFT_VERSION=${{ env.MC_VERSION }}
             JAVA_VERSION=${{ env.JAVA_VERSION }}
+            PARCHMENT_MINECRAFT_VERSION=1.18.2
       - name: Check java version
         run: |
           docker images

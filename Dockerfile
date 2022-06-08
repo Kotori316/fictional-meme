@@ -16,12 +16,13 @@ FROM eclipse-temurin:${JAVA_VERSION} as cache
 ARG MINECRAFT_VERSION
 ARG MAPPING_CHANNEL="official"
 ARG MAPPING_VERSION=$MINECRAFT_VERSION
+ARG PARCHMENT_MINECRAFT_VERSION=$MINECRAFT_VERSION
 RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --quiet curl libxml2-utils --no-install-recommends \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --quiet curl libxml2-utils \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
-RUN curl -Ss -o ${MINECRAFT_VERSION}-versions.xml https://ldtteam.jfrog.io/artifactory/parchmentmc-public/org/parchmentmc/data/parchment-${MINECRAFT_VERSION}/maven-metadata.xml && \
-    xmllint -xpath "/metadata/versioning/release/text()" ${MINECRAFT_VERSION}-versions.xml > /parchment_version.txt
+RUN curl -Ss -o ${PARCHMENT_MINECRAFT_VERSION}-versions.xml https://ldtteam.jfrog.io/artifactory/parchmentmc-public/org/parchmentmc/data/parchment-${PARCHMENT_MINECRAFT_VERSION}/maven-metadata.xml && \
+    xmllint -xpath "/metadata/versioning/release/text()" ${PARCHMENT_MINECRAFT_VERSION}-versions.xml > /parchment_version.txt
 COPY ["run/build.gradle", "gradlew", "/work/"]
 COPY ["gradle/wrapper/*", "/work/gradle/wrapper/"]
 
@@ -38,7 +39,7 @@ RUN export CI_FORGE=$(cat /forge.txt) && \
      ./gradlew prepareRuns --no-daemon > /dev/null || (sleep 15s && ./gradlew prepareRuns --no-daemon)) && \
      ./gradlew build --no-daemon
 
-RUN CI_FORGE=$(cat /forge.txt) MAPPING_CHANNEL="parchment" MAPPING_VERSION="${MINECRAFT_VERSION}-$(cat /parchment_version.txt)-${MINECRAFT_VERSION}" \
+RUN CI_FORGE=$(cat /forge.txt) MAPPING_CHANNEL="parchment" MAPPING_VERSION="${PARCHMENT_MINECRAFT_VERSION}-$(cat /parchment_version.txt)-${MINECRAFT_VERSION}" \
     ./gradlew build --no-daemon
 
 # ------------------------------------------------------------------
