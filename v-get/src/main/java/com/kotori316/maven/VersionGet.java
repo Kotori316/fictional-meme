@@ -24,13 +24,14 @@ public final class VersionGet {
         }
         String version = args[0];
         if (version.toLowerCase(Locale.ROOT).contains("snapshot")) {
+            System.out.println(String.format("Detected SNAPSHOT version(%s).", version));
             return;
         }
         String mavenUrl = fixUrl(args[1]);
         List<String> versionList = readVersions(mavenUrl);
         if (versionList.stream().map(String::toLowerCase)
             .anyMatch(Predicate.isEqual(version.toLowerCase(Locale.ROOT)))) {
-            System.out.println("exists.");
+            System.out.println(String.format("%s exists.", version));
             System.exit(1);
         } else {
             System.exit(0);
