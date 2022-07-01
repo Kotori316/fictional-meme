@@ -50,8 +50,10 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 RUN mkdir -p /work/gradle/wrapper && mkdir -p /work/build/natives && mkdir -p /root/.gradle/caches
-COPY --from=builder ["/fictional-meme/app/build/libs/*", "/fictional-meme/v-get/build/libs/*", "/"]
+
+COPY --chmod=755 check_version.sh /check_version.sh
 COPY --from=cache /root/.gradle/caches/ /root/.gradle/caches/
 COPY --from=cache /work/build/natives/ /work/build/natives/
 COPY --from=cache /forge.txt /forge.txt
 COPY --from=cache /parchment_version.txt /parchment_version.txt
+COPY --from=builder ["/fictional-meme/app/build/libs/*", "/fictional-meme/v-get/build/libs/*", "/"]
