@@ -68,7 +68,7 @@ jobs:
           build-args: |
             MINECRAFT_VERSION=${{ env.MC_VERSION }}
             JAVA_VERSION=${{ env.JAVA_VERSION }}
-            PARCHMENT_MINECRAFT_VERSION=1.18.2
+            PARCHMENT_MINECRAFT_VERSION=1.19.2
       - name: Check java version
         run: |
           docker images
@@ -82,6 +82,10 @@ jobs:
           docker run --rm ${IMAGE_NAME}:${TAG} java -jar $jar_path
           echo "Latest version of Minecraft ${{ env.MC_VERSION }}"
           docker run --rm ${IMAGE_NAME}:${TAG} java -jar $jar_path ${{ env.MC_VERSION }}
+      - name: Check cache version
+        run: |
+          docker run --rm ${IMAGE_NAME}:${TAG} cat /forge.txt
+          docker run --rm ${IMAGE_NAME}:${TAG} cat /parchment_version.txt
       - name: Push1
         run: docker push ${IMAGE_NAME}:${TAG}
       - name: Push2
