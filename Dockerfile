@@ -21,7 +21,7 @@ RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --quiet curl libxml2-utils \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
-RUN curl -Ss -o ${PARCHMENT_MINECRAFT_VERSION}-versions.xml https://ldtteam.jfrog.io/artifactory/parchmentmc-public/org/parchmentmc/data/parchment-${PARCHMENT_MINECRAFT_VERSION}/maven-metadata.xml && \
+RUN curl -LSs -o ${PARCHMENT_MINECRAFT_VERSION}-versions.xml https://ldtteam.jfrog.io/artifactory/parchmentmc-public/org/parchmentmc/data/parchment-${PARCHMENT_MINECRAFT_VERSION}/maven-metadata.xml && \
     xmllint -xpath "/metadata/versioning/release/text()" ${PARCHMENT_MINECRAFT_VERSION}-versions.xml > /parchment_version.txt
 COPY ["run/build.gradle", "gradlew", "/work/"]
 COPY ["gradle/wrapper/*", "/work/gradle/wrapper/"]

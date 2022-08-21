@@ -28,4 +28,4 @@ jobs:
           build-args: |
             MINECRAFT_VERSION=${{ env.MC_VERSION }}
             JAVA_VERSION=${{ env.JAVA_VERSION }}
-            PARCHMENT_MINECRAFT_VERSION=1.18.2
+            PARCHMENT_MINECRAFT_VERSION=1.19.2
