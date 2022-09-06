@@ -36,7 +36,7 @@ jobs:
     env:
       MC_VERSION: 1.19
     container:
-      image: ghcr.io/kotori316/fictional-meme/fictional-meme:${{ env.MC_VERSION }}
+      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.19
       credentials:
         username: kotori316
         password: ${{ secrets.GITHUB_TOKEN }}
@@ -54,7 +54,7 @@ jobs:
         with:
           cache-disabled: true
           arguments: test copyGameTestTemplate runGameTestServer
-        working-directory: fluidtank
+          build-root-directory: fluidtank
       # QuarryPlus
       - uses: actions/checkout@v3
         with:
@@ -68,4 +68,4 @@ jobs:
         with:
           cache-disabled: true
           arguments: test copyGameTestTemplate runGameTestServer
-        working-directory: quarryplus
+          build-root-directory: quarryplus
