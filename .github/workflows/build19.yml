@@ -5,13 +5,12 @@ on:
     - cron: "0 5 * * TUE"
   workflow_dispatch:
 
-env:
-  MC_VERSION: 1.19
-  JAVA_VERSION: 17
-
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      MC_VERSION: 1.19
+      JAVA_VERSION: 17
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v1
@@ -34,6 +33,8 @@ jobs:
   check:
     runs-on: ubuntu-latest
     needs: build
+    env:
+      MC_VERSION: 1.19
     container:
       image: ghcr.io/kotori316/fictional-meme/fictional-meme:${{ env.MC_VERSION }}
       credentials:
