@@ -42,6 +42,10 @@ RUN export CI_FORGE=$(cat /forge.txt) && \
 RUN CI_FORGE=$(cat /forge.txt) MAPPING_CHANNEL="parchment" MAPPING_VERSION="${PARCHMENT_MINECRAFT_VERSION}-$(cat /parchment_version.txt)-${MINECRAFT_VERSION}" \
     ./gradlew build --no-daemon
 
+RUN export quarry_mapping=$(curl -sSL https://github.com/Kotori316/QuarryPlus/raw/1.19/gradle.properties | grep parchmentMapping) && \
+    CI_FORGE=$(cat /forge.txt) MAPPING_CHANNEL="parchment" MAPPING_VERSION="${PARCHMENT_MINECRAFT_VERSION}-${quarry_mapping##*-}-${MINECRAFT_VERSION}" \
+    ./gradlew build --no-daemon
+
 # ------------------------------------------------------------------
 FROM eclipse-temurin:${JAVA_VERSION}
 
