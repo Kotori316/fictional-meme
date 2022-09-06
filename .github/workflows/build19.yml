@@ -42,7 +42,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Set forge version
-        runs: echo "CI_FORGE=$(cat /forge.txt)" >> $GITHUB_ENV
+        run: echo "CI_FORGE=$(cat /forge.txt)" >> $GITHUB_ENV
       # FluidTank
       - uses: actions/checkout@v3
         with:
