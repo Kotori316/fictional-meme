@@ -5,10 +5,11 @@ on:
     - cron: "0 5 * * TUE"
   workflow_dispatch:
 
+env:
+  MC_VERSION: 1.19
+  JAVA_VERSION: 17
+
 jobs:
-  env:
-    MC_VERSION: 1.19
-    JAVA_VERSION: 17
   build:
     runs-on: ubuntu-latest
     steps:
