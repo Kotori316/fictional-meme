@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - "app/**"
+      - "v-get/**"
       - ".github/workflows/build.yml"
       - "Dockerfile"
 
