@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -eu
-# Arg1: local location of gradle.properties 
+# Arg1: local location of gradle.properties
 # Arg2: location of maven-metadata.xml
 
 VERSION_GETTER_JAR=$(find / -maxdepth 1 -name "v-get*.jar")
