@@ -77,6 +77,8 @@ jobs:
           echo "::group::Module List"
           docker run --rm ${IMAGE_NAME}:${TAG} java --list-modules
           echo "::endgroup::"
+      - name: Check Files
+        run: docker run --rm ${IMAGE_NAME}:${TAG} ls /
       - name: Check forge version
         run: |
           jar_path=$(docker run --rm ${IMAGE_NAME}:${TAG} find / -maxdepth 1 -name fictional-meme*.jar)
@@ -88,7 +90,7 @@ jobs:
       - name: Check version list script
         run: | 
           set -eu
-          a=$(docker run --rm ${IMAGE_NAME}:${TAG} /list_version.sh "${URL}")
+          a=$(docker run --rm ${IMAGE_NAME}:${TAG} /list_versions.sh "${URL}")
           echo "$a" | grep 19
         env:
           URL: https://pkgs.dev.azure.com/Kotori316/minecraft/_packaging/mods/maven/v1/com/kotori316/additionalenchantedminer/maven-metadata.xml
