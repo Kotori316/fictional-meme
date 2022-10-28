@@ -81,12 +81,10 @@ jobs:
         run: docker run --rm ${IMAGE_NAME}:${TAG} ls /
       - name: Check forge version
         run: |
-          jar_path=$(docker run --rm ${IMAGE_NAME}:${TAG} find / -maxdepth 1 -name fictional-meme*.jar)
-          echo "Found jar file at $jar_path"
           echo "Latest version of forge"
-          docker run --rm ${IMAGE_NAME}:${TAG} java -jar $jar_path
+          docker run --rm ${IMAGE_NAME}:${TAG} /get_latest.sh
           echo "Latest version of Minecraft ${{ env.MC_VERSION }}"
-          docker run --rm ${IMAGE_NAME}:${TAG} java -jar $jar_path ${{ env.MC_VERSION }}
+          docker run --rm ${IMAGE_NAME}:${TAG} /get_latest.sh ${{ env.MC_VERSION }}
       - name: Check version list script
         run: | 
           set -eu

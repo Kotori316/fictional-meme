@@ -19,8 +19,7 @@ jobs:
     steps:
       - name: Get latest version
         run: |
-          JAR_PATH=$(docker run ghcr.io/kotori316/fictional-meme/fictional-meme:${{ env.TAG_VERSION }} find / -maxdepth 1 -name "fictional*.jar")
-          LATEST_VERSION=$(docker run ghcr.io/kotori316/fictional-meme/fictional-meme:${{ env.TAG_VERSION }} java -jar "${JAR_PATH}" ${{ env.MC_VERSION }})
+          LATEST_VERSION=$(docker run ghcr.io/kotori316/fictional-meme/fictional-meme:${{ env.TAG_VERSION }} /get_latest.sh ${{ env.MC_VERSION }})
           echo "LATEST_VERSION=${LATEST_VERSION}" >> $GITHUB_ENV
       - name: Set output
         id: set_output
