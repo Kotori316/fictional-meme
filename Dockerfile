@@ -55,7 +55,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 RUN mkdir -p /work/gradle/wrapper && mkdir -p /work/build/natives && mkdir -p /root/.gradle/caches
 
-COPY --chmod=755 ["check_version.sh", "list_versions.sh", "/"]
+COPY --chmod=755 ["scripts/*.sh",  "/"]
 COPY --from=cache /root/.gradle/caches/ /root/.gradle/caches/
 COPY --from=cache /work/build/natives/ /work/build/natives/
 COPY --from=cache /forge.txt /forge.txt
