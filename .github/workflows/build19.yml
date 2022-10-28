@@ -30,15 +30,15 @@ jobs:
           echo "Event: ${{ github.event_name }}"
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             echo "Latest: ${LATEST_VERSION}, Image: ${IMAGE_VERSION}"
-            echo "::set-output name=run_build::true"
+            echo "run_build=true" >> $GITHUB_OUTPUT
             exit 0
           fi
           if [ "${LATEST_VERSION}" != "${IMAGE_VERSION}" ]; then
             echo "Run CI to use ${LATEST_VERSION}, before ${IMAGE_VERSION}"
-            echo "::set-output name=run_build::true"
+            echo "run_build=true" >> $GITHUB_OUTPUT
           else
             echo "Stop CI because the image has ${IMAGE_VERSION}(latest: ${LATEST_VERSION}), which is the latest."
-            echo "::set-output name=run_build::false"
+            echo "run_build=false" >> $GITHUB_OUTPUT
           fi
 
   build:
