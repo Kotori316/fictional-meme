@@ -72,7 +72,7 @@ jobs:
     needs: [ check_version, build ]
     if: ${{ fromJSON(needs.check_version.outputs.run_build) }}
     container:
-      image: ghcr.io/kotori316/fictional-meme/fictional-meme@sha256:${{ needs.build.outputs.digest }}
+      image: ghcr.io/kotori316/fictional-meme/fictional-meme@${{ needs.build.outputs.digest }}
       credentials:
         username: kotori316
         password: ${{ secrets.GITHUB_TOKEN }}
@@ -101,7 +101,7 @@ jobs:
     needs: [ check_version, build ]
     if: ${{ fromJSON(needs.check_version.outputs.run_build) }}
     container:
-      image: ghcr.io/kotori316/fictional-meme/fictional-meme@sha256:${{ needs.build.outputs.digest }}
+      image: ghcr.io/kotori316/fictional-meme/fictional-meme@${{ needs.build.outputs.digest }}
       credentials:
         username: kotori316
         password: ${{ secrets.GITHUB_TOKEN }}
