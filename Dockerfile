@@ -17,6 +17,7 @@ ARG MINECRAFT_VERSION
 ARG MAPPING_CHANNEL="official"
 ARG MAPPING_VERSION=$MINECRAFT_VERSION
 ARG PARCHMENT_MINECRAFT_VERSION=$MINECRAFT_VERSION
+ARG QUARRY_BRANCH="1.19"
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --quiet curl libxml2-utils \
     && apt-get clean \
@@ -42,7 +43,7 @@ RUN export CI_FORGE=$(cat /forge.txt) && \
 RUN CI_FORGE=$(cat /forge.txt) MAPPING_CHANNEL="parchment" MAPPING_VERSION="${PARCHMENT_MINECRAFT_VERSION}-$(cat /parchment_version.txt)-${MINECRAFT_VERSION}" \
     ./gradlew build --no-daemon
 
-RUN export quarry_mapping=$(curl -sSL https://github.com/Kotori316/QuarryPlus/raw/1.19/gradle.properties | grep parchmentMapping) && \
+RUN export quarry_mapping=$(curl -sSL "https://github.com/Kotori316/QuarryPlus/raw/${QUARRY_BRANCH}/gradle.properties" | grep parchmentMapping) && \
     CI_FORGE=$(cat /forge.txt) MAPPING_CHANNEL="parchment" MAPPING_VERSION="${PARCHMENT_MINECRAFT_VERSION}-${quarry_mapping##*-}-${MINECRAFT_VERSION}" \
     ./gradlew build --no-daemon
 

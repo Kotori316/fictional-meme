@@ -65,6 +65,7 @@ jobs:
             MINECRAFT_VERSION=${{ env.MC_VERSION }}
             JAVA_VERSION=${{ env.JAVA_VERSION }}
             PARCHMENT_MINECRAFT_VERSION=1.19.2
+            QUARRY_BRANCH=1.19
 
   check-FluidTank:
     runs-on: ubuntu-latest

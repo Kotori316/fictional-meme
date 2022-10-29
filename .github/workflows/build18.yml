@@ -28,3 +28,4 @@ jobs:
           build-args: |
             MINECRAFT_VERSION=${{ env.MC_VERSION }}
             JAVA_VERSION=${{ env.JAVA_VERSION }}
+            QUARRY_BRANCH=1.18
