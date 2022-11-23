@@ -1,0 +1,47 @@
+name: Test a repository with container
+
+on:
+  workflow_call:
+    inputs:
+      repository:
+        required: true
+        type: string
+      branch:
+        required: true
+        type: string
+      container-image:
+        required: true
+        type: string
+    secrets:
+      token:
+        required: true
+
+jobs:
+  test-run:
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ inputs.container-image }}
+      credentials:
+        username: test-repo-workflow
+        password: ${{ secrets.token }}
+    steps:
+      - name: setup variable
+        run: echo "LOWER_NAME=${NAME,,}" >> $GITHUB_ENV
+        env:
+          NAME: ${{ inputs.repository }}
+        shell: /usr/bin/bash {0}
+      - uses: actions/checkout@v3
+        name: Checkout ${{ inputs.repository }}
+        with:
+          repository: '${{ inputs.repository }}'
+          ref: '${{ inputs.branch }}'
+          path: '${{ env.LOWER_NAME }}'
+      - name: Permission of gradlew
+        run: chmod +x ./gradlew
+        working-directory: '${{ env.LOWER_NAME }}'
+      - name: Test ${{ inputs.repository }}
+        uses: gradle/gradle-build-action@v2
+        with:
+          cache-disabled: true
+          arguments: test runGameTestServer
+          build-root-directory: '${{ env.LOWER_NAME }}'
