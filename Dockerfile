@@ -18,6 +18,7 @@ ARG MAPPING_CHANNEL="official"
 ARG MAPPING_VERSION=$MINECRAFT_VERSION
 ARG PARCHMENT_MINECRAFT_VERSION=$MINECRAFT_VERSION
 ARG QUARRY_BRANCH="1.19"
+ARG LATEST_FORGE
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --quiet curl libxml2-utils \
     && apt-get clean \
@@ -27,9 +28,7 @@ RUN curl -LSs -o ${PARCHMENT_MINECRAFT_VERSION}-versions.xml https://ldtteam.jfr
 COPY ["run/build.gradle", "gradlew", "/work/"]
 COPY ["gradle/wrapper/*", "/work/gradle/wrapper/"]
 
-COPY --from=builder /fictional-meme/app/build/libs/* /
-
-RUN echo $(java -jar $(find / -maxdepth 1 -name "*.jar") ${MINECRAFT_VERSION}) > /forge.txt
+RUN echo "${LATEST_FORGE}" > /forge.txt
 WORKDIR /work
 
 RUN export CI_FORGE=$(cat /forge.txt) && \
@@ -40,11 +39,15 @@ RUN export CI_FORGE=$(cat /forge.txt) && \
      ./gradlew prepareRuns --no-daemon > /dev/null || (sleep 15s && ./gradlew prepareRuns --no-daemon)) && \
      ./gradlew build --no-daemon
 
-RUN CI_FORGE=$(cat /forge.txt) MAPPING_CHANNEL="parchment" MAPPING_VERSION="${PARCHMENT_MINECRAFT_VERSION}-$(cat /parchment_version.txt)-${MINECRAFT_VERSION}" \
+RUN CI_FORGE=$(cat /forge.txt) \
+    MAPPING_CHANNEL="parchment" \
+    MAPPING_VERSION="${PARCHMENT_MINECRAFT_VERSION}-$(cat /parchment_version.txt)-${MINECRAFT_VERSION}" \
     ./gradlew build --no-daemon
 
 RUN export quarry_mapping=$(curl -sSL "https://github.com/Kotori316/QuarryPlus/raw/${QUARRY_BRANCH}/gradle.properties" | grep parchmentMapping) && \
-    CI_FORGE=$(cat /forge.txt) MAPPING_CHANNEL="parchment" MAPPING_VERSION="${PARCHMENT_MINECRAFT_VERSION}-${quarry_mapping##*-}-${MINECRAFT_VERSION}" \
+    CI_FORGE=$(cat /forge.txt) \
+    MAPPING_CHANNEL="parchment" \
+    MAPPING_VERSION="${PARCHMENT_MINECRAFT_VERSION}-${quarry_mapping##*-}-${MINECRAFT_VERSION}" \
     ./gradlew build --no-daemon
 
 # ------------------------------------------------------------------

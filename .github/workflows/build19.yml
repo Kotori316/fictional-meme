@@ -13,33 +13,10 @@ env:
 
 jobs:
   check_version:
-    runs-on: ubuntu-latest
-    outputs:
-      run_build: ${{ steps.set_output.outputs.run_build }}
-    steps:
-      - name: Get latest version
-        run: |
-          LATEST_VERSION=$(docker run ghcr.io/kotori316/fictional-meme/fictional-meme:${{ env.TAG_VERSION }} /get_latest.sh ${{ env.MC_VERSION }})
-          echo "LATEST_VERSION=${LATEST_VERSION}" >> $GITHUB_ENV
-      - name: Set output
-        id: set_output
-        run: |
-          set -eu
-          IMAGE_VERSION=$(docker run ghcr.io/kotori316/fictional-meme/fictional-meme:${{ env.TAG_VERSION }} cat /forge.txt)
-          echo "Event: ${{ github.event_name }}"
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "Latest: ${LATEST_VERSION}, Image: ${IMAGE_VERSION}"
-            echo "Force Run"
-            echo "run_build=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-          if [ "${LATEST_VERSION}" != "${IMAGE_VERSION}" ]; then
-            echo "Run CI to use ${LATEST_VERSION}, before ${IMAGE_VERSION}"
-            echo "run_build=true" >> $GITHUB_OUTPUT
-          else
-            echo "Stop CI because the image has ${IMAGE_VERSION}(latest: ${LATEST_VERSION}), which is the latest."
-            echo "run_build=false" >> $GITHUB_OUTPUT
-          fi
+    uses: ./.github/workflows/test-repo.yml
+    with:
+      minecraft-version: 1.19.2
+      tag-version: 1.19
 
   build:
     needs: check_version
@@ -67,6 +44,7 @@ jobs:
             JAVA_VERSION=${{ env.JAVA_VERSION }}
             PARCHMENT_MINECRAFT_VERSION=1.19.2
             QUARRY_BRANCH=1.19
+            LATEST_FORGE=${{ needs.check_version.outputs.latest_version }}
 
   check-mods:
     needs: [ check_version, build ]

@@ -1,0 +1,51 @@
+name: Version Checker
+
+on:
+  workflow_call:
+    inputs:
+      minecraft-version:
+        required: true
+        type: string
+      tag-version:
+        required: true
+        type: string
+    outputs:
+      run_build:
+        description: "Whether workflow should build new container for the mc version."
+        value: ${{ jobs.check_version.outputs.run_build }}
+      latest_version:
+        description: "The latest version of Forge fot the mc version."
+        value: ${{ jobs.check_version.outputs.latest_version }}
+
+jobs:
+  check_version:
+    runs-on: ubuntu-latest
+    outputs:
+      run_build: ${{ steps.set_output.outputs.run_build }}
+      latest_version: ${{ steps.get_latest.outputs.latest_version }}
+    steps:
+      - name: Get latest version
+        id: get_latest
+        run: |
+          LATEST_VERSION=$(docker run ghcr.io/kotori316/fictional-meme/fictional-meme:${{ inputs.tag-version }} /get_latest.sh ${{ inputs.minecraft-version }})
+          echo "LATEST_VERSION=${LATEST_VERSION}" >> $GITHUB_ENV
+          echo "latest_version=${LATEST_VERSION}" >> $GITHUB_OUTPUT
+      - name: Set output
+        id: set_output
+        run: |
+          set -eu
+          IMAGE_VERSION=$(docker run ghcr.io/kotori316/fictional-meme/fictional-meme:${{ inputs.tag-version }} cat /forge.txt)
+          echo "Event: ${{ github.event_name }}"
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "Latest: ${LATEST_VERSION}, Image: ${IMAGE_VERSION}"
+            echo "Force Run"
+            echo "run_build=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          if [ "${LATEST_VERSION}" != "${IMAGE_VERSION}" ]; then
+            echo "Run CI to use ${LATEST_VERSION}, before ${IMAGE_VERSION}"
+            echo "run_build=true" >> $GITHUB_OUTPUT
+          else
+            echo "Stop CI because the image has ${IMAGE_VERSION}(latest: ${LATEST_VERSION}), which is the latest."
+            echo "run_build=false" >> $GITHUB_OUTPUT
+          fi

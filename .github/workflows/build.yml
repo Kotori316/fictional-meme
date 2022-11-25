@@ -42,7 +42,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      MC_VERSION: 1.19
+      MC_VERSION: 1.19.2
+      TAG_VERSION: 1.19
       JAVA_VERSION: 17
     steps:
       - uses: actions/checkout@v3
@@ -56,8 +57,13 @@ jobs:
         run: |
           i=ghcr.io/${{ github.repository }}/fictional-meme
           echo "IMAGE_NAME=${i,,}" >> $GITHUB_ENV
-          t=${{ env.MC_VERSION }}
+          t=${{ env.TAG_VERSION }}
           echo "TAG=${t,,}" >> $GITHUB_ENV
+      - name: Get latest
+        run: |
+          curl -LO https://files.minecraftforge.net/net/minecraftforge/forge/promotions_slim.json
+          forge_v=$(cat promotions_slim.json | jq -r '.promos | with_entries(select(.key | contains("latest") and test("${{ env.MC_VERSION }}-"))) | .[]')
+          echo "LATEST_FORGE=${{ env.MC_VERSION }}-${forge_v}" >> $GITHUB_ENV
       - name: Build
         uses: docker/build-push-action@v3
         with:
