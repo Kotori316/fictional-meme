@@ -1,22 +1,21 @@
 name: Weekly Build for 1.19
 
 on:
-#  schedule:
-#    - cron: "0 5 * * TUE"
+  schedule:
+    - cron: "0 5 * * TUE"
   workflow_dispatch:
 
 env:
-  TAG_VERSION: 1.19
-  MC_VERSION: 1.19.2
+  TAG_VERSION: 1.19.3
+  MC_VERSION: 1.19.3
   JAVA_VERSION: 17
-  BRANCH: 1.19
 
 jobs:
   check_version:
     uses: Kotori316/fictional-meme/.github/workflows/version-check.yml@master
     with:
-      minecraft-version: 1.19.2
-      tag-version: 1.19
+      minecraft-version: 1.19.3
+      tag-version: 1.19.3
 
   build:
     needs: check_version
@@ -43,13 +42,14 @@ jobs:
             MINECRAFT_VERSION=${{ env.MC_VERSION }}
             JAVA_VERSION=${{ env.JAVA_VERSION }}
             PARCHMENT_MINECRAFT_VERSION=1.19.2
-            REFERENCE_REPOSITORY=https://github.com/Kotori316/QuarryPlus.git
-            REFERENCE_REPOSITORY_BRANCH=1.19
+            REFERENCE_REPOSITORY=https://github.com/Kotori316/AutoPlanter.git
+            REFERENCE_REPOSITORY_BRANCH=1.19.3
             LATEST_FORGE=${{ needs.check_version.outputs.latest_version }}
 
   check-mods:
     needs: [ check_version, build ]
-    if: ${{ fromJSON(needs.check_version.outputs.run_build) }}
+    # if: ${{ fromJSON(needs.check_version.outputs.run_build) }}
+    if: false
     strategy:
       matrix:
         repository: [FluidTank, QuarryPlus]

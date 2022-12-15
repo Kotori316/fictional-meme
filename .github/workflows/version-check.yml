@@ -27,7 +27,11 @@ jobs:
       - name: Get latest version
         id: get_latest
         run: |
-          LATEST_VERSION=$(docker run ghcr.io/kotori316/fictional-meme/fictional-meme:${{ inputs.tag-version }} /get_latest.sh ${{ inputs.minecraft-version }})
+          tag=${{ inputs.tag-version }}
+          if ! docker pull ghcr.io/kotori316/fictional-meme/fictional-meme:${{ inputs.tag-version }} ; then
+            tag="latest"
+          fi
+          LATEST_VERSION=$(docker run ghcr.io/kotori316/fictional-meme/fictional-meme:${tag} /get_latest.sh ${{ inputs.minecraft-version }})
           echo "LATEST_VERSION=${LATEST_VERSION}" >> $GITHUB_ENV
           echo "latest_version=${LATEST_VERSION}" >> $GITHUB_OUTPUT
       - name: Set output

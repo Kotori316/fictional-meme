@@ -1,3 +1,5 @@
+# syntax = docker/dockerfile:1
+
 ARG JAVA_VERSION
 FROM eclipse-temurin:${JAVA_VERSION} as builder
 
@@ -7,9 +9,11 @@ COPY ["gradle", "fictional-meme/gradle"]
 COPY ["gradlew", "settings.gradle", "fictional-meme/"]
 
 # Clone and Build Jar
-RUN cd fictional-meme && \
-    chmod +x ./gradlew && \
-    ./gradlew clean shadowJar
+RUN <<EOF
+cd fictional-meme
+chmod +x ./gradlew
+./gradlew clean shadowJar
+EOF
 
 # ------------------------------------------------------------------
 FROM eclipse-temurin:${JAVA_VERSION} as cache
@@ -17,38 +21,45 @@ ARG MINECRAFT_VERSION
 ARG MAPPING_CHANNEL="official"
 ARG MAPPING_VERSION=$MINECRAFT_VERSION
 ARG PARCHMENT_MINECRAFT_VERSION=$MINECRAFT_VERSION
-ARG QUARRY_BRANCH="1.19"
+ARG REFERENCE_REPOSITORY
+ARG REFERENCE_REPOSITORY_BRANCH
 ARG LATEST_FORGE
-RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --quiet curl libxml2-utils \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
-RUN curl -LSs -o ${PARCHMENT_MINECRAFT_VERSION}-versions.xml https://ldtteam.jfrog.io/artifactory/parchmentmc-public/org/parchmentmc/data/parchment-${PARCHMENT_MINECRAFT_VERSION}/maven-metadata.xml && \
-    xmllint -xpath "/metadata/versioning/release/text()" ${PARCHMENT_MINECRAFT_VERSION}-versions.xml > /parchment_version.txt
+RUN <<EOF
+apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get install -y --quiet curl libxml2-utils git
+apt-get clean
+rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
+EOF
+RUN <<EOF
+curl -LSs -o ${PARCHMENT_MINECRAFT_VERSION}-versions.xml https://ldtteam.jfrog.io/artifactory/parchmentmc-public/org/parchmentmc/data/parchment-${PARCHMENT_MINECRAFT_VERSION}/maven-metadata.xml
+xmllint -xpath "/metadata/versioning/release/text()" ${PARCHMENT_MINECRAFT_VERSION}-versions.xml > /parchment_version.txt
+EOF
 COPY ["run/build.gradle", "gradlew", "/work/"]
 COPY ["gradle/wrapper/*", "/work/gradle/wrapper/"]
 
 RUN echo "${LATEST_FORGE}" > /forge.txt
 WORKDIR /work
+RUN chmod +x ./gradlew
 
-RUN export CI_FORGE=$(cat /forge.txt) && \
-    export MAPPING_CHANNEL=${MAPPING_CHANNEL} && \
-    export MAPPING_VERSION=${MAPPING_VERSION} && \
-    chmod +x ./gradlew && \
-    (./gradlew prepareRuns --no-daemon > /dev/null || ./gradlew prepareRuns --no-daemon > /dev/null || \
-     ./gradlew prepareRuns --no-daemon > /dev/null || (sleep 15s && ./gradlew prepareRuns --no-daemon)) && \
-     ./gradlew build --no-daemon
+RUN CI_FORGE=$(cat /forge.txt) \
+    MAPPING_CHANNEL=${MAPPING_CHANNEL} \
+    MAPPING_VERSION=${MAPPING_VERSION} \
+    ./gradlew prepareRuns build --no-daemon
 
 RUN CI_FORGE=$(cat /forge.txt) \
     MAPPING_CHANNEL="parchment" \
     MAPPING_VERSION="${PARCHMENT_MINECRAFT_VERSION}-$(cat /parchment_version.txt)-${MINECRAFT_VERSION}" \
     ./gradlew build --no-daemon
 
-RUN export quarry_mapping=$(curl -sSL "https://github.com/Kotori316/QuarryPlus/raw/${QUARRY_BRANCH}/gradle.properties" | grep parchmentMapping) && \
-    CI_FORGE=$(cat /forge.txt) \
-    MAPPING_CHANNEL="parchment" \
-    MAPPING_VERSION="${PARCHMENT_MINECRAFT_VERSION}-${quarry_mapping##*-}-${MINECRAFT_VERSION}" \
-    ./gradlew build --no-daemon
+RUN <<EOF
+export FORGE_ONLY=true
+if [ -n "${REFERENCE_REPOSITORY}" ] && [ -n "${REFERENCE_REPOSITORY_BRANCH}" ]; then
+  git clone "${REFERENCE_REPOSITORY}" -b "${REFERENCE_REPOSITORY_BRANCH}" reference-repo
+  cd reference-repo
+  chmod +x ./gradlew
+  ./gradlew build --no-daemon
+fi
+EOF
 
 # ------------------------------------------------------------------
 FROM eclipse-temurin:${JAVA_VERSION}
