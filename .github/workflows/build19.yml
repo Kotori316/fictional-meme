@@ -13,7 +13,7 @@ env:
 
 jobs:
   check_version:
-    uses: ./.github/workflows/test-repo.yml
+    uses: Kotori316/fictional-meme/.github/workflows/version-check.yml@master
     with:
       minecraft-version: 1.19.2
       tag-version: 1.19
@@ -52,7 +52,7 @@ jobs:
     strategy:
       matrix:
         repository: [FluidTank, QuarryPlus]
-    uses: ./.github/workflows/test-repo.yml
+    uses: Kotori316/fictional-meme/.github/workflows/test-repo.yml@master
     with:
       repository: 'Kotori316/${{ matrix.repository }}'
       branch: 1.19
