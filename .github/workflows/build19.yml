@@ -1,8 +1,8 @@
 name: Weekly Build for 1.19
 
 on:
-  schedule:
-    - cron: "0 5 * * TUE"
+#  schedule:
+#    - cron: "0 5 * * TUE"
   workflow_dispatch:
 
 env:
