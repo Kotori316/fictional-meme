@@ -1,4 +1,4 @@
-name: Weekly Build for 1.19
+name: Weekly Build for 1.19.3
 
 on:
   schedule:
