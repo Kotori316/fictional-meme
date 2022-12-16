@@ -48,8 +48,8 @@ jobs:
 
   check-mods:
     needs: [ check_version, build ]
-    # if: ${{ fromJSON(needs.check_version.outputs.run_build) }}
-    if: false
+    if: ${{ fromJSON(needs.check_version.outputs.run_build) }}
+    # if: false
     strategy:
       matrix:
         repository: [FluidTank, QuarryPlus]
