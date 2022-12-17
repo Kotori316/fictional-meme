@@ -39,6 +39,8 @@ jobs:
       - name: Permission of gradlew
         run: chmod +x ./gradlew
         working-directory: '${{ env.LOWER_NAME }}'
+      - name: Set forge version
+        run: echo "CI_FORGE=$(cat /forge.txt)" >> $GITHUB_ENV
       - name: Test ${{ inputs.repository }}
         uses: gradle/gradle-build-action@v2
         with:
