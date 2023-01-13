@@ -44,7 +44,7 @@ jobs:
             JAVA_VERSION=${{ env.JAVA_VERSION }}
             PARCHMENT_MINECRAFT_VERSION=1.19.2
             REFERENCE_REPOSITORY=https://github.com/Kotori316/QuarryPlus.git
-            REFERENCE_REPOSITORY_BRANCH=1.19
+            REFERENCE_REPOSITORY_BRANCH=1.19.2
             LATEST_FORGE=${{ needs.check_version.outputs.latest_version }}
 
   check-mods:
@@ -52,11 +52,11 @@ jobs:
     if: ${{ fromJSON(needs.check_version.outputs.run_build) }}
     strategy:
       matrix:
-        repository: [FluidTank, QuarryPlus]
+        repository: [QuarryPlus]
     uses: Kotori316/fictional-meme/.github/workflows/test-repo.yml@master
     with:
       repository: 'Kotori316/${{ matrix.repository }}'
-      branch: 1.19
+      branch: 1.19.2
       container-image: ghcr.io/kotori316/fictional-meme/fictional-meme@${{ needs.build.outputs.digest }}
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
