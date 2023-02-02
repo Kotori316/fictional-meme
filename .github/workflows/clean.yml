@@ -29,5 +29,5 @@ jobs:
         run: python3 ./clean_container.py
         env:
           USER_NAME: Kotori316
-          PACKAGE_NAME: dl_container
+          PACKAGE_NAME: dlcount-daily
           TOKEN_GITHUB: ${{ secrets.PAT_TOKEN }}
