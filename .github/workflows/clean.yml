@@ -25,7 +25,7 @@ jobs:
           USER_NAME: Kotori316
           PACKAGE_NAME: DownloadCounts%2Fdlcount
           TOKEN_GITHUB: ${{ secrets.PAT_TOKEN }}
-      - name: Clean dl_container
+      - name: Clean dlcount-daily
         run: python3 ./clean_container.py
         env:
           USER_NAME: Kotori316
