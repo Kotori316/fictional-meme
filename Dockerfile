@@ -10,6 +10,7 @@ COPY ["gradlew", "settings.gradle", "fictional-meme/"]
 
 # Clone and Build Jar
 RUN <<EOF
+set -eu
 cd fictional-meme
 chmod +x ./gradlew
 ./gradlew clean shadowJar
@@ -25,12 +26,14 @@ ARG REFERENCE_REPOSITORY
 ARG REFERENCE_REPOSITORY_BRANCH
 ARG LATEST_FORGE
 RUN <<EOF
+set -eu
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get install -y --quiet curl libxml2-utils git
 apt-get clean
 rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 EOF
 RUN <<EOF
+set -eu
 curl -LSs -o ${PARCHMENT_MINECRAFT_VERSION}-versions.xml https://ldtteam.jfrog.io/artifactory/parchmentmc-public/org/parchmentmc/data/parchment-${PARCHMENT_MINECRAFT_VERSION}/maven-metadata.xml
 xmllint -xpath "/metadata/versioning/release/text()" ${PARCHMENT_MINECRAFT_VERSION}-versions.xml > /parchment_version.txt
 EOF
@@ -63,6 +66,10 @@ EOF
 
 # ------------------------------------------------------------------
 FROM eclipse-temurin:${JAVA_VERSION}
+ARG MINECRAFT_VERSION
+ARG LATEST_FORGE
+LABEL org.opencontainers.image.source=https://github.com/Kotori316/fictional-meme
+LABEL org.opencontainers.image.description="For Minecraft ${MINECRAFT_VERSION} with Forge ${LATEST_FORGE}"
 
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --quiet git --no-install-recommends \
