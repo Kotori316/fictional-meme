@@ -1,4 +1,4 @@
-name: Weekly Build for 1.19.3
+name: Weekly Build for 1.19.4
 
 on:
   schedule:
@@ -6,16 +6,16 @@ on:
   workflow_dispatch:
 
 env:
-  TAG_VERSION: 1.19.3
-  MC_VERSION: 1.19.3
+  TAG_VERSION: 1.19.4
+  MC_VERSION: 1.19.4
   JAVA_VERSION: 17
 
 jobs:
   check_version:
     uses: Kotori316/fictional-meme/.github/workflows/version-check.yml@master
     with:
-      minecraft-version: 1.19.3
-      tag-version: 1.19.3
+      minecraft-version: 1.19.4
+      tag-version: 1.19.4
 
   build:
     needs: check_version
@@ -43,7 +43,7 @@ jobs:
             JAVA_VERSION=${{ env.JAVA_VERSION }}
             PARCHMENT_MINECRAFT_VERSION=1.19.3
             REFERENCE_REPOSITORY=https://github.com/Kotori316/AutoPlanter.git
-            REFERENCE_REPOSITORY_BRANCH=1.19.3
+            REFERENCE_REPOSITORY_BRANCH=1.19.4
             LATEST_FORGE=${{ needs.check_version.outputs.latest_version }}
 
   check-mods:
