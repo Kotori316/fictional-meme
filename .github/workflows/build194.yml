@@ -1,22 +1,21 @@
-name: Weekly Build for 1.19
+name: Weekly Build for 1.19.4
 
 on:
-#  schedule:
-#    - cron: "0 5 * * TUE"
+  schedule:
+    - cron: "0 5 * * TUE"
   workflow_dispatch:
 
 env:
-  TAG_VERSION: 1.19
-  MC_VERSION: 1.19.2
+  TAG_VERSION: 1.19.4
+  MC_VERSION: 1.19.4
   JAVA_VERSION: 17
-  BRANCH: 1.19
 
 jobs:
   check_version:
     uses: Kotori316/fictional-meme/.github/workflows/version-check.yml@master
     with:
-      minecraft-version: 1.19.2
-      tag-version: 1.19
+      minecraft-version: 1.19.4
+      tag-version: 1.19.4
 
   build:
     needs: check_version
@@ -42,21 +41,22 @@ jobs:
           build-args: |
             MINECRAFT_VERSION=${{ env.MC_VERSION }}
             JAVA_VERSION=${{ env.JAVA_VERSION }}
-            PARCHMENT_MINECRAFT_VERSION=1.19.2
-            REFERENCE_REPOSITORY=https://github.com/Kotori316/QuarryPlus.git
-            REFERENCE_REPOSITORY_BRANCH=1.19.2
+            PARCHMENT_MINECRAFT_VERSION=1.19.3
+            REFERENCE_REPOSITORY=https://github.com/Kotori316/AutoPlanter.git
+            REFERENCE_REPOSITORY_BRANCH=1.19.4
             LATEST_FORGE=${{ needs.check_version.outputs.latest_version }}
 
   check-mods:
     needs: [ check_version, build ]
     if: ${{ fromJSON(needs.check_version.outputs.run_build) }}
+    # if: false
     strategy:
       matrix:
-        repository: [QuarryPlus]
+        repository: [FluidTank, QuarryPlus]
     uses: Kotori316/fictional-meme/.github/workflows/test-repo.yml@master
     with:
       repository: 'Kotori316/${{ matrix.repository }}'
-      branch: 1.19.2
+      branch: 1.19
       container-image: ghcr.io/kotori316/fictional-meme/fictional-meme@${{ needs.build.outputs.digest }}
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}

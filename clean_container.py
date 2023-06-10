@@ -7,8 +7,9 @@ import requests
 def read_json(user_name, package_name, access_token):
     url = f"https://api.github.com/users/{user_name}/packages/container/{package_name}/versions"
     headers = {
-        "Accept": "application/vnd.github.v3+json",
-        "Authorization": f"token {access_token}",
+        "Accept": "application/vnd.github+json",
+        "Authorization": f"Bearer {access_token}",
+        "X-GitHub-Api-Version": "2022-11-28",
     }
     return requests.get(url, headers=headers).json()
 
@@ -24,8 +25,9 @@ def get_empty_tag_containers(container_array):
 def delete_container(user_name, package_name, access_token, container_id, container_name):
     url = f"https://api.github.com/users/{user_name}/packages/container/{package_name}/versions/{container_id}"
     headers = {
-        "Accept": "application/vnd.github.v3+json",
-        "Authorization": f"token {access_token}",
+        "Accept": "application/vnd.github+json",
+        "Authorization": f"Bearer {access_token}",
+        "X-GitHub-Api-Version": "2022-11-28",
     }
     requests.delete(url, headers=headers)
     print(f"Deleted {container_id}({container_name}) in {package_name}")
@@ -38,9 +40,9 @@ def main():
     parser.add_argument("--token", type=str, help="GitHub PAT")
     parser.add_argument("--dry", help="Dry run", action="store_true")
     args = parser.parse_args()
-    user_name = os.getenv("USER_NAME") or args.username
-    package_name = os.getenv("PACKAGE_NAME") or args.package
-    access_token = os.getenv("TOKEN_GITHUB") or args.token
+    user_name = args.username or os.getenv("USER_NAME")
+    package_name = args.package or os.getenv("PACKAGE_NAME")
+    access_token = args.token or os.getenv("TOKEN_GITHUB")
     assert user_name and package_name and access_token, "Parameters must be set."
     container_array = read_json(user_name, package_name, access_token)
     to_delete = get_empty_tag_containers(container_array)
